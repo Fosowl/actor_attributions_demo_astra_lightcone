@@ -1,0 +1,10 @@
+id: baseline
+description: "The study's accepted configuration: shape-aware and conservative."
+
+decisions:
+  distance_metric:
+    option_id: mahalanobis
+    selected_by: {actor: oliver, role: methodology}
+  threshold_rule:
+    option_id: loo_alpha_01
+    selected_by: {actor: oliver, role: methodology}
