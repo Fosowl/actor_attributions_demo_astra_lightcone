@@ -55,6 +55,18 @@ CRediT-derived vocabulary keyed to the actor's type (`conceptualization` and
 
 ![Attribution flow](assets/attribution_flow.gif)
 
+## A real-data example
+
+[`korean-pledges-demo/`](korean-pledges-demo/) applies the layer to a real
+study: 218 committed Korean forest-policy pledge sentences and the filter
+decision where the theoretically better metric lost to the evidence — the
+agent proposed shape-aware Mahalanobis, the numbers and a close reading of
+the retained sentences favored simple Euclidean, and a human overruled the
+theory. The record preserves who proposed, who ruled, and when; a runnable
+pipeline recomputes every quoted number from the committed data.
+
+![Korean pledges decision, attributed](assets/korean_pledges_decision.svg)
+
 ## What validation now catches
 
 ```

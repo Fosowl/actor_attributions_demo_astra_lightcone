@@ -5,6 +5,8 @@ with the real failure mode the actor layer exists for: **the
 theoretically better method lost to the evidence, and a human had to make
 that call.**
 
+![The distance_metric decision, attributed](../assets/korean_pledges_decision.svg)
+
 ## The 90-second story
 
 A dissertation pipeline filters Korean presidential/district election
@@ -30,6 +32,8 @@ records *that* Mahalanobis was excluded and why. The actor layer records
 *who* proposed the theoretically-better option, *who* overruled it after
 inspection, and *when* — the human judgment call that no metric could have
 made, preserved where a reviewer or future collaborator can find it.
+
+![The decision, animated](../assets/korean_pledges_flow.gif)
 
 ## Run it
 
