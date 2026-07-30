@@ -1,6 +1,24 @@
 # Korean pledges demo — design
 
-Status: approved design, pre-implementation.
+Status: approved design; amended during implementation (see Amendments).
+
+## Amendments (build-time)
+
+- ASTRA semantic validation refuses a universe that selects an excluded
+  option (`EXCLUDED_OPTION_SELECTED`), so the two what-if universe files
+  cannot exist as valid universes. `baseline.yaml` is the only committed
+  universe; the counterfactuals run as named decision-flag presets through
+  the filter CLI — the same `{decisions.*}` recipe form the analysis file
+  declares. The refusal itself is documented in the README as part of the
+  enforcement story.
+- Recipe commands accept only `{inputs}`/`{inputs.<id>}`/`{decisions.<id>}`/
+  `{output}` placeholders, so the analysis recipes pass decisions as
+  `--metric`/`--threshold` flags rather than a universe name.
+- The reference statistics are derived from the study's operative reference
+  file (`embeddings6_projected.csv`) with its exact conventions (ridged
+  covariance `np.cov + 1e-6*I`; full-LOO Mahalanobis distribution;
+  LOO-centroid non-squared Euclidean distribution), recovered by matching
+  the study's per-sentence distances and keep decisions exactly.
 
 ## Purpose
 
