@@ -1,102 +1,92 @@
 # Live-demo script (chat-first)
 
-The demo is driven through an agentic coding assistant (e.g. Claude Code)
-opened at the **repo root** — the root `CLAUDE.md` primes it with the
-actor-layer authoring reference, so these prompts work without warm-up.
-Type the prompts in order; the assistant runs every command itself.
+Six short prompts for an agentic coding assistant (e.g. Claude Code)
+opened at the **repo root**. The root `CLAUDE.md` primes it with the
+actor-layer rules and the right commands, so the prompts can stay short —
+the assistant runs everything itself.
 
 Prereq: `./install_and_validate.sh` has been run once.
 
-The arc: the assistant itself picks the theoretically better metric in
-prompt 1 — and the rest of the demo shows the recorded human decision that
-overruled that exact reasoning. Say once, before prompt 5: the committed
-`analysis/astra.yaml` is the record; the assistant encodes facts from
-`analysis/plain/RECORDED_FACTS.md` into schema fields — it formats
-recorded provenance, it does not invent it.
+The arc: the assistant picks the method that is better on paper in prompt
+1, and the rest of the demo shows the recorded human decision that
+overturned exactly that reasoning. Before prompt 5, say once: the
+committed `analysis/astra.yaml` is the record; the assistant is putting
+recorded facts from `analysis/plain/RECORDED_FACTS.md` into the right
+fields, not inventing them.
 
-A terminal-only fallback (no assistant) is at the bottom.
+A terminal-only fallback is at the bottom.
 
 ---
 
-**1 — The trap: ask the assistant what theory says**
+**1 — The trap**
 
-> In korean-pledges-demo, out-of-sample pledge sentences are tested for
-> membership in a topic cluster in an 18-dimensional embedding space, and
-> the reference clusters are anisotropic. On theory alone: which distance
-> metric should be the better membership test, Euclidean or Mahalanobis?
-> Commit to one, two sentences max. Do not look at any results yet.
+> Sentences are points in space, and the topic groups they belong to are
+> stretched, not round. Which distance measure should be the better test
+> of whether a point belongs to a group: Euclidean or Mahalanobis? Answer
+> from theory only, one sentence.
 
-Expected: the assistant picks **Mahalanobis** — shape-aware, accounts for
-cluster anisotropy. That is exactly what the study team assumed too.
+Expect: **Mahalanobis** — it accounts for each group's stretched shape,
+Euclidean treats every direction alike. That is what the study team
+assumed too.
 
-**2 — Now look at the evidence**
+**2 — The evidence**
 
-> Now read korean-pledges-demo/README.md, run ./run_demo.sh in
-> korean-pledges-demo, then run ./run_demo.sh -u what-if-mahalanobis, and
-> compare the two retentions. Which sentences does the theoretically
-> better metric throw away that the accepted filter keeps? Show a few.
+> In korean-pledges-demo, run ./run_demo.sh, then run it again with
+> -u what-if-mahalanobis. Compare the two, and show me a few sentences
+> Mahalanobis throws away.
 
-Expected: baseline (euclidean, accepted) 161/218 (73.9%); the mahalanobis
-replay keeps 68/218 (31.2%) and the diff lists real pledge sentences it
-would have discarded. The assistant confronts its own prompt-1 answer:
-the shape-aware metric was over-rejecting — its per-cluster covariance is
-estimated from few reference points in 18 dimensions, so the "shape" is
-substantially noise.
+Expect: the accepted filter keeps 161/218 (73.9%); Mahalanobis keeps
+68/218 (31.2%), and real discarded pledge sentences appear on screen. The
+better-on-paper method was throwing away more than half the good
+material: it measures each group's shape from only a handful of examples,
+so the shape it adapts to is mostly noise.
 
 **3 — The point, said out loud**
 
-> So was your theory answer wrong, and who was in a position to decide
-> that?
+> So was your theory answer wrong, and who could have decided that?
 
-Expected: the assistant concedes the theory-based pick failed on this
-corpus, and that no metric settles this — someone had to inspect the
-retained sentences and rule. That ruling is the thing worth recording.
-(Study-reported corpus-wide numbers, if asked: Euclidean 1,143/1,662 =
-68.8% vs Mahalanobis 846/1,662 = 50.9%; the switch was directed and
-verified in the manuscript revision round of 2026-06-11.)
+Expect: the assistant concedes the theory pick failed on this data, and
+that settling it took a person reading the sentences. That judgment is
+what is worth recording. (Full-dataset numbers if asked: Euclidean kept
+1,143 of 1,662 sentences, 68.8%; Mahalanobis 846, 50.9%. The switch was
+made and checked during the manuscript revision of 2026-06-11.)
 
-**4 — Excluded means excluded (enforcement)**
+**4 — Excluded means excluded**
 
-> Create a scratch universe file in /tmp that selects the excluded
-> mahalanobis option and validate it against
-> korean-pledges-demo/analysis/astra.yaml with the repo venv's astra.
-> What happens, and why?
+> Write a universe file in /tmp that picks the excluded mahalanobis
+> option, validate it against korean-pledges-demo/analysis/astra.yaml,
+> and tell me what happens.
 
-Expected: `EXCLUDED_OPTION_SELECTED` — an excluded option is not a
-selectable branch; the earlier replay was a diagnostic, not a universe.
+Expect: `EXCLUDED_OPTION_SELECTED` — a ruled-out option cannot come back
+as a real choice. The earlier run was a replay for inspection only.
 
-**5 — THE FILL-IN: the assistant adds the actor layer**
+**5 — The fill-in: the assistant adds the actor layer**
 
-> Copy korean-pledges-demo/analysis/plain/astra.yaml to /tmp/attributed.yaml.
-> It records the decision space but not WHO did anything. Read
-> korean-pledges-demo/analysis/plain/RECORDED_FACTS.md and add the
-> RFC-0003 actor layer to the copy: register the actors and attribute the
-> exclusion exactly as recorded. Then validate the file with the repo
-> venv's astra.
+> Copy korean-pledges-demo/analysis/plain/astra.yaml to
+> /tmp/attributed.yaml — it says what was decided but not who decided it.
+> Add the actor layer using the facts in RECORDED_FACTS.md beside it,
+> then validate it.
 
-Expected: the assistant edits the YAML live — an `actors:` registry plus
+Expect: the assistant edits the file live — an `actors` registry plus
 `proposed_by` / `excluded_by` / `excluded_at` / `exclusion_rationale` on
-the excluded option — and validation comes back green. The actor layer is
-enforced schema, not decoration: an agent actor without `model`, an
-unknown actor id, or attribution on a non-excluded option would all fail.
+the ruled-out option — and validation passes. These fields are checked,
+not decorative: an agent with no model named, an unknown person, or a
+"who excluded it" on an option that was not excluded all fail.
 
-**6 — Prove it, then the payoff**
+**6 — The payoff**
 
-> Diff /tmp/attributed.yaml against the committed
-> korean-pledges-demo/analysis/astra.yaml and summarize what the actor
-> layer added. Then run env -u PYTHONPATH .venv/bin/astra info -f
-> korean-pledges-demo/analysis/astra.yaml -d and tell me who excluded
-> what, and when.
+> Diff your file against the committed
+> korean-pledges-demo/analysis/astra.yaml, then run astra info on that
+> one and tell me who excluded what, and when.
 
-Expected: the diff is essentially the actor delta (registry + one
-attribution block), and `astra info` renders "proposed by claude_code;
-excluded by oliver (validation)" with the date and rationale.
+Expect: the diff is just the actor layer; `astra info` shows "proposed by
+claude_code; excluded by oliver (validation)" with the date and reason.
 
-Closing line: the assistant proposed the theoretically better metric —
-the same answer it gave live in prompt 1. A human inspected the evidence
-and overruled it. Without the actor layer, the file only says Mahalanobis
-was excluded; with it, it says who proposed it, who overruled it, and
-when — the judgment call no metric could have made.
+Closing line: the assistant proposed the method that is better on paper —
+the same answer it gave live in prompt 1. A person looked at the results
+and overruled it. Without this layer the file only says Mahalanobis was
+ruled out; with it, the file says who proposed it, who overruled it, and
+when.
 
 ---
 
@@ -116,6 +106,6 @@ decisions:
 EOF
 env -u PYTHONPATH ../.venv/bin/astra validate /tmp/bad-universe.yaml -a analysis/astra.yaml
                                        # EXCLUDED_OPTION_SELECTED
-diff analysis/plain/astra.yaml analysis/astra.yaml   # the actor-layer delta
+diff analysis/plain/astra.yaml analysis/astra.yaml   # the actor layer, side by side
 env -u PYTHONPATH ../.venv/bin/astra info -f analysis/astra.yaml -d
 ```
