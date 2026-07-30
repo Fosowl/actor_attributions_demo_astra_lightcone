@@ -1,0 +1,6 @@
+[submodule "astra-spec"]
+	path = astra-spec
+	url = https://github.com/Fosowl/astra-spec.git
+[submodule "astra-tools"]
+	path = astra-tools
+	url = https://github.com/Fosowl/astra-tools.git
