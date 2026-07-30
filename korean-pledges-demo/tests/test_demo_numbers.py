@@ -19,7 +19,10 @@ from filter_pledges import get_config, get_retention  # noqa: E402
 ROOT = Path(__file__).resolve().parents[1]
 CSV = ROOT / "data" / "pledges_subset.csv"
 NPZ = ROOT / "data" / "reference_stats.npz"
-YAML_TEXT = (ROOT / "analysis" / "astra.yaml").read_text()
+# The plain twin quotes the same numbers and must obey the same invariant.
+YAML_TEXT = (ROOT / "analysis" / "astra.yaml").read_text() + (
+    ROOT / "analysis" / "plain" / "astra.yaml"
+).read_text()
 RUN_NAMES = ["baseline", "what-if-euclidean", "what-if-chisq"]
 
 
@@ -60,7 +63,11 @@ def test_headline_numbers_are_present():
 
 @pytest.mark.parametrize(
     "target",
-    ["analysis/astra.yaml", "analysis/universes/baseline.yaml"],
+    [
+        "analysis/astra.yaml",
+        "analysis/plain/astra.yaml",
+        "analysis/universes/baseline.yaml",
+    ],
 )
 def test_astra_validate_green(target: str):
     astra = ROOT.parent / ".venv" / "bin" / "astra"
