@@ -134,3 +134,13 @@ astra-tools (`rfc-0003-impl`):
 - The `ResearcherId` at-least-one-identifier constraint (class-level
   `any_of`) compiles to neither Pydantic nor JSON Schema; it is enforced
   only by astra-tools (`EMPTY_IDENTIFIERS`).
+- **Open defect, must be fixed before the implementation PR.** The explicit
+  `union(string, DecisionSelection)` on the two `decisions` slots compiles to a
+  self-contradictory JSON Schema on linkml 1.10.0, so *every* universe file in
+  astra-spec fails generated-JSON-Schema validation, including files that predate
+  the actor layer. `astra validate` is unaffected because it runs through the
+  Pydantic models. astra-spec's suite stays green because valid fixtures load
+  through the gen-python dataclasses and only invalid fixtures reach the
+  JSON-Schema validator. Until this is fixed, the backward-compatibility claim
+  holds for the Pydantic and dataclass paths but not for the generated JSON
+  Schema. Reproduction, bisect, and two verified fixes are in issue #1.

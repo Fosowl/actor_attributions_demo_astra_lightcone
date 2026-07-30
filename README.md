@@ -21,7 +21,7 @@ a decision and the *selections* of a universe.
 ```bash
 git clone --recurse-submodules https://github.com/Fosowl/actor_attributions_demo_astra_lightcone
 cd actor_attributions_demo_astra_lightcone
-./install_and_validate.sh            # install forks (editable) + validate the iris example
+./install_and_validate.sh            # install forks + validate the iris example
 ./install_and_validate.sh --suite    # additionally run the astra-tools test suite
 ```
 
