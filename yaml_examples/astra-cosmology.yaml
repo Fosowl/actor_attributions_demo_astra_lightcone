@@ -1,0 +1,146 @@
+# ASTRA Analysis Specification
+
+version: "0.0.12"
+id: sn_lcdm_fit
+name: "Flat LCDM fit to the Union2.1 supernova compilation"
+description: |
+  Fit a flat LCDM cosmological model to the SCP Union2.1 Type Ia supernova
+  Hubble diagram (distance modulus mu vs redshift z), varying only the dark
+  energy density Omega_Lambda (flatness fixes Omega_M = 1 - Omega_Lambda).
+  The Hubble constant is not fit: the data file's header records the absolute
+  magnitude calibration M(h=0.7), so the published mu values are tied to
+  h = 0.7 and the model is evaluated at H0 = 70 km/s/Mpc, parsed from that
+  header rather than hardcoded. First pass: inputs, outputs, and recipes
+  only — methodological forks (error treatment, fit method, redshift cuts)
+  are deliberately not yet promoted to decisions.
+
+inputs:
+  - id: union21
+    type: data
+    label: "Union2.1 mu vs z"
+    source: data/SCPUnion2.1_mu_vs_z.txt
+    description: |
+      SCP Union2.1 compilation of 580 SNe Ia: columns are (SN name, redshift z,
+      distance modulus mu, statistical uncertainty sigma_mu, probability the SN
+      is hosted by a low-mass galaxy). Header comment lines carry the light-curve
+      standardization metadata — alpha, beta, delta, and the absolute magnitude
+      M(h=0.7) — meaning the tabulated mu values assume h = 0.7. Recipes parse
+      h from the "M(h=...)" header line to set H0; sigma_mu is statistical only
+      (the systematics covariance matrix is a separate Union2.1 product,
+      declared as the covmat_sys input and gated by the error_model decision).
+
+  - id: covmat_nosys
+    type: data
+    label: "Union2.1 covariance (no systematics)"
+    source: data/SCPUnion2.1_covmat_nosys.txt
+    description: |
+      580x580 statistical-only covariance matrix of mu, in the same SN order
+      as the mu-vs-z table. Verified purely diagonal, with diagonal exactly
+      equal to sigma_mu^2 from the main data file (max |sigma^2 - diag| ~
+      2e-12) — so fitting with this matrix reproduces the diagonal
+      sigma_mu-column fit identically.
+
+  - id: covmat_sys
+    type: data
+    label: "Union2.1 covariance (with systematics)"
+    source: data/SCPUnion2.1_covmat_sys.txt
+    description: |
+      580x580 covariance matrix of mu including systematic errors, same SN
+      order as the mu-vs-z table. Dense: ~336k nonzero off-diagonal elements
+      encoding correlated systematics, with diagonal ~10% larger (median)
+      than the statistical-only matrix.
+
+prior_insights:
+  suzuki2012_sne_omega_lambda:
+    label: "Suzuki+12 SNe-only Omega_Lambda"
+    claim: >
+      From the Union2.1 SNe Ia alone, Suzuki et al. (2012) — the paper that
+      published this compilation — constrain flat LCDM to Omega_Lambda =
+      0.705 (+0.040/-0.043) including systematic errors; their
+      statistical-only fit (Table 7) gives Omega_m = 0.277 (+0.022/-0.021),
+      i.e. Omega_Lambda = 0.723 (+0.021/-0.022).
+    created_at: "2026-07-29T17:00:00Z"
+    tags: [benchmark]
+    evidence:
+      - id: sec51_sne_alone
+        doi: "10.48550/arXiv.1105.3470"
+        quote:
+          exact: "In a flat Universe, SNe Ia alone constrain the dark-energy density, ΩΛ , to be ΩΛ = 0.705+0.040 −0.043 including systematics."
+        location:
+          page: 17
+      - id: table7_sne_stat_only
+        doi: "10.48550/arXiv.1105.3470"
+        quote:
+          exact: "SNe 0.277+0.022 −0.021"
+          prefix: "SNe+BAO+CMB+H0"
+        location:
+          page: 18
+    notes: >
+      Benchmark for the best_fit output. The comparable number is the
+      statistical-only one (Omega_Lambda = 0.723), since our fit uses the
+      diagonal statistical sigma_mu column only. Our uncertainty is expected
+      to be smaller than theirs: Suzuki et al. analytically marginalize over
+      the absolute magnitude (equivalently H0) and use the full statistical
+      covariance matrix, whereas this first pass fixes H0 = 70 from the
+      header calibration and ignores off-diagonal terms.
+
+decisions:
+  error_model:
+    label: "Error model"
+    tags: [stats]
+    default: stat_only
+    rationale: |
+      The main data file's sigma_mu column was verified to be exactly the
+      square root of the diagonal of covmat_nosys (agreement ~2e-12), and
+      that matrix is purely diagonal — so the first-pass fit silently
+      assumed statistical-only, uncorrelated errors. Union2.1 also ships a
+      dense covariance including correlated systematics; Suzuki et al.
+      (2012) report both fits, with the systematics interval roughly twice
+      as wide. Which matrix enters the chi-square directly changes both the
+      central value and the width of the Omega_Lambda constraint, so it must
+      be an explicit fork, not a default buried in the data format.
+    options:
+      stat_only:
+        label: "Statistical only"
+        description: |
+          Chi-square with the diagonal statistical covariance (covmat_nosys,
+          identical to the data file's sigma_mu column). Matches the
+          first-pass fit and Suzuki et al.'s "statistical" column.
+      with_systematics:
+        label: "With systematics"
+        description: |
+          Generalized chi-square r^T C^-1 r with the full dense systematics
+          covariance (covmat_sys). Matches the error treatment behind
+          Suzuki et al.'s quoted SNe-alone constraint.
+        insights: [suzuki2012_sne_omega_lambda]
+
+outputs:
+  - id: best_fit
+    type: metric
+    label: "Best-fit Omega_Lambda"
+    description: |
+      Best-fit Omega_Lambda for flat LCDM from a generalized chi-square fit
+      of the model distance modulus to the Union2.1 mu(z), with the
+      covariance matrix selected by the error_model decision and
+      H0 = 100h km/s/Mpc taken from the header's M(h=...) metadata.
+      JSON containing Omega_Lambda, its 1-sigma uncertainty (from the
+      delta-chi2 = 1 interval), Omega_M, chi2_min, degrees of freedom, the
+      error model used, and the H0 used — everything downstream consumers
+      need to reproduce the model curve without re-reading the data header.
+    inputs: [union21, covmat_nosys, covmat_sys]
+    decisions: [error_model]
+    recipe:
+      command: python scripts/fit_lcdm.py --data {inputs.union21} --errors {decisions.error_model} --covmat-nosys {inputs.covmat_nosys} --covmat-sys {inputs.covmat_sys} --out {output}
+
+  - id: hubble_diagram
+    type: figure
+    label: "Best-fit Hubble diagram"
+    description: |
+      Two-panel Hubble diagram at the best fit. Top: absolute panel — observed
+      mu vs z with statistical error bars and the best-fit flat LCDM mu(z)
+      curve. Bottom: residuals panel — mu_obs - mu_model about zero, same
+      error bars, shared log-z axis. Downstream of best_fit: the model curve
+      is drawn from the fitted parameters in that artifact, not refit.
+    inputs: [union21, best_fit]
+    recipe:
+      command: python scripts/plot_hubble.py --data {inputs.union21} --fit {inputs.best_fit} --out {output}

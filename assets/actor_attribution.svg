@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 480" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <!-- background -->
+  <rect x="0" y="0" width="960" height="480" fill="#ffffff"/>
+
+  <!-- ============ LEFT: actors registry card ============ -->
+  <rect x="30" y="95" width="252" height="222" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.25"/>
+  <text x="50" y="127" font-size="15" font-weight="700" fill="#1e293b">actors:</text>
+
+  <!-- jane entry -->
+  <rect x="48" y="145" width="216" height="70" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <rect x="52" y="151" width="4" height="58" rx="2" fill="#4f46e5"/>
+  <text x="68" y="171" font-size="13" font-weight="700" fill="#1e293b">jane</text>
+  <rect x="108" y="158" width="50" height="17" rx="8.5" fill="#eef2ff" stroke="#c7d2fe" stroke-width="0.75"/>
+  <text x="133" y="170" font-size="10" font-weight="600" fill="#4f46e5" text-anchor="middle">human</text>
+  <text x="68" y="197" font-size="11" fill="#64748b">orcid: 0009-&#8230;-0000</text>
+
+  <!-- assistant entry -->
+  <rect x="48" y="229" width="216" height="70" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <rect x="52" y="235" width="4" height="58" rx="2" fill="#d97706"/>
+  <text x="68" y="255" font-size="13" font-weight="700" fill="#1e293b">assistant</text>
+  <rect x="148" y="242" width="48" height="17" rx="8.5" fill="#fef3c7" stroke="#fde68a" stroke-width="0.75"/>
+  <text x="172" y="254" font-size="10" font-weight="600" fill="#b45309" text-anchor="middle">agent</text>
+  <text x="68" y="281" font-size="11" fill="#64748b">claude-opus-5 / claude-code</text>
+
+  <!-- ============ connectors (registry -> chips) ============ -->
+  <path d="M 266 180 C 308 180, 316 178, 354 178" fill="none" stroke="#94a3b8" stroke-width="1.3" opacity="0.75"/>
+  <circle cx="266" cy="180" r="2.4" fill="#94a3b8" opacity="0.9"/>
+  <circle cx="356" cy="178" r="2.4" fill="#94a3b8" opacity="0.9"/>
+
+  <path d="M 266 264 C 308 264, 316 256, 354 256" fill="none" stroke="#94a3b8" stroke-width="1.3" opacity="0.75"/>
+  <circle cx="266" cy="264" r="2.4" fill="#94a3b8" opacity="0.9"/>
+  <circle cx="356" cy="256" r="2.4" fill="#94a3b8" opacity="0.9"/>
+
+  <!-- ============ CENTER: decision card ============ -->
+  <rect x="332" y="86" width="312" height="240" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.25"/>
+  <text x="352" y="118" font-size="15" fill="#64748b">decision: <tspan font-weight="700" fill="#1e293b">outlier_handling</tspan></text>
+
+  <!-- option: keep_all -->
+  <rect x="348" y="136" width="280" height="62" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="362" y="158" font-size="12.5" font-weight="600" fill="#1e293b">keep_all</text>
+  <rect x="362" y="168" width="232" height="20" rx="10" fill="#eef2ff" stroke="#c7d2fe" stroke-width="0.75"/>
+  <text x="370" y="181.5" font-size="10" fill="#4338ca">proposed by jane (conceptualization)</text>
+
+  <!-- option: drop_iqr (excluded) -->
+  <rect x="348" y="212" width="280" height="96" rx="8" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="362" y="234" font-size="12.5" font-weight="600" fill="#94a3b8">drop_iqr</text>
+  <line x1="360" y1="230" x2="420" y2="230" stroke="#94a3b8" stroke-width="1.2"/>
+  <rect x="432" y="221" width="66" height="17" rx="8.5" fill="#fee2e2" stroke="#fecaca" stroke-width="0.75"/>
+  <text x="465" y="233" font-size="9.5" font-weight="700" fill="#dc2626" text-anchor="middle">excluded</text>
+  <rect x="362" y="246" width="226" height="20" rx="10" fill="#fef3c7" stroke="#fde68a" stroke-width="0.75"/>
+  <text x="370" y="259.5" font-size="10" fill="#b45309">proposed by assistant (methodology)</text>
+  <rect x="362" y="272" width="190" height="20" rx="10" fill="#eef2ff" stroke="#c7d2fe" stroke-width="0.75"/>
+  <text x="370" y="285.5" font-size="10" fill="#4338ca">excluded by jane (validation)</text>
+
+  <!-- ============ RIGHT: universe card ============ -->
+  <rect x="696" y="127" width="240" height="158" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.25"/>
+  <text x="716" y="159" font-size="15" fill="#64748b">universe: <tspan font-weight="700" fill="#1e293b">baseline</tspan></text>
+
+  <rect x="712" y="177" width="208" height="90" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="726" y="199" font-size="12.5" font-weight="600" fill="#1e293b">scaling: standard</text>
+  <rect x="726" y="209" width="142" height="20" rx="10" fill="#fef3c7" stroke="#fde68a" stroke-width="0.75"/>
+  <text x="734" y="222.5" font-size="10" fill="#b45309">selected by assistant</text>
+  <rect x="726" y="235" width="112" height="20" rx="10" fill="#eef2ff" stroke="#c7d2fe" stroke-width="0.75"/>
+  <text x="734" y="248.5" font-size="10" fill="#4338ca">reviewed by jane</text>
+
+  <!-- ============ caption ============ -->
+  <text x="480" y="400" font-size="13" font-style="italic" fill="#64748b" text-anchor="middle">The record now says who exercised each judgment.</text>
+</svg>

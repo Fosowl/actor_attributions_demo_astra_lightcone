@@ -1,0 +1,13 @@
+id: baseline
+description: "Default configuration using standard practices"
+
+decisions:
+  scaling:
+    option_id: standard
+    selected_by: {actor: assistant, role: methodology}
+    reviewed_by: {actor: jane, role: validation}
+  model:
+    option_id: random_forest
+    selected_by: {actor: jane, role: methodology}
+  test_size: small
+  random_seed: seed_42
