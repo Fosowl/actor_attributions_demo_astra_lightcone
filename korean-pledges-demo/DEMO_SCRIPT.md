@@ -7,80 +7,96 @@ Type the prompts in order; the assistant runs every command itself.
 
 Prereq: `./install_and_validate.sh` has been run once.
 
-Framing (say once, before prompt 4): the committed
-`analysis/astra.yaml` is the record. In prompt 4 the assistant encodes
-facts from `analysis/plain/RECORDED_FACTS.md` into schema fields — it
-formats recorded provenance, it does not invent it.
+The arc: the assistant itself picks the theoretically better metric in
+prompt 1 — and the rest of the demo shows the recorded human decision that
+overruled that exact reasoning. Say once, before prompt 5: the committed
+`analysis/astra.yaml` is the record; the assistant encodes facts from
+`analysis/plain/RECORDED_FACTS.md` into schema fields — it formats
+recorded provenance, it does not invent it.
 
 A terminal-only fallback (no assistant) is at the bottom.
 
 ---
 
-**1 — Run the real pipeline**
+**1 — The trap: ask the assistant what theory says**
 
-> Read korean-pledges-demo/README.md, then run ./run_demo.sh in
-> korean-pledges-demo and report what was filtered and what the retention
-> number means.
+> In korean-pledges-demo, out-of-sample pledge sentences are tested for
+> membership in a topic cluster in an 18-dimensional embedding space, and
+> the reference clusters are anisotropic. On theory alone: which distance
+> metric should be the better membership test, Euclidean or Mahalanobis?
+> Commit to one, two sentences max. Do not look at any results yet.
 
-Expected: 68/218 (31.2%) retained — shape-aware metric, conservative
-threshold, and the assistant explains the filter in one breath.
+Expected: the assistant picks **Mahalanobis** — shape-aware, accounts for
+cluster anisotropy. That is exactly what the study team assumed too.
 
-**2 — Excluded means excluded (enforcement)**
+**2 — Now look at the evidence**
+
+> Now read korean-pledges-demo/README.md, run ./run_demo.sh in
+> korean-pledges-demo, then run ./run_demo.sh -u what-if-mahalanobis, and
+> compare the two retentions. Which sentences does the theoretically
+> better metric throw away that the accepted filter keeps? Show a few.
+
+Expected: baseline (euclidean, accepted) 161/218 (73.9%); the mahalanobis
+replay keeps 68/218 (31.2%) and the diff lists real pledge sentences it
+would have discarded. The assistant confronts its own prompt-1 answer:
+the shape-aware metric was over-rejecting — its per-cluster covariance is
+estimated from few reference points in 18 dimensions, so the "shape" is
+substantially noise.
+
+**3 — The point, said out loud**
+
+> So was your theory answer wrong, and who was in a position to decide
+> that?
+
+Expected: the assistant concedes the theory-based pick failed on this
+corpus, and that no metric settles this — someone had to inspect the
+retained sentences and rule. That ruling is the thing worth recording.
+(Study-reported corpus-wide numbers, if asked: Euclidean 1,143/1,662 =
+68.8% vs Mahalanobis 846/1,662 = 50.9%; the switch was directed and
+verified in the manuscript revision round of 2026-06-11.)
+
+**4 — Excluded means excluded (enforcement)**
 
 > Create a scratch universe file in /tmp that selects the excluded
-> euclidean option and validate it against
+> mahalanobis option and validate it against
 > korean-pledges-demo/analysis/astra.yaml with the repo venv's astra.
 > What happens, and why?
 
-Expected: `EXCLUDED_OPTION_SELECTED` — the assistant explains that an
-excluded option is not a selectable branch; everything after this is a
-diagnostic replay for audit.
+Expected: `EXCLUDED_OPTION_SELECTED` — an excluded option is not a
+selectable branch; the earlier replay was a diagnostic, not a universe.
 
-**3 — Show the real problem (diagnostic replay)**
-
-> Now run ./run_demo.sh -u what-if-euclidean in korean-pledges-demo, open
-> analysis/examples/euclidean_extras.md, and tell me whether those three
-> sentences belong in a "Forest Bioenergy" topic cluster.
-
-Expected: retention jumps to 161/218 (73.9%); the pre-translated sentences
-are defense industry, urban parks, food/bio industry — off-topic. The
-tempting number admits junk.
-
-**4 — THE FILL-IN: the assistant adds the actor layer**
+**5 — THE FILL-IN: the assistant adds the actor layer**
 
 > Copy korean-pledges-demo/analysis/plain/astra.yaml to /tmp/attributed.yaml.
 > It records the decision space but not WHO did anything. Read
 > korean-pledges-demo/analysis/plain/RECORDED_FACTS.md and add the
-> RFC-0003 actor layer to the copy: register the actors and attribute both
-> exclusions exactly as recorded. Then validate the file with the repo
+> RFC-0003 actor layer to the copy: register the actors and attribute the
+> exclusion exactly as recorded. Then validate the file with the repo
 > venv's astra.
 
 Expected: the assistant edits the YAML live — an `actors:` registry plus
 `proposed_by` / `excluded_by` / `excluded_at` / `exclusion_rationale` on
-each excluded option — and validation comes back green. The actor layer is
+the excluded option — and validation comes back green. The actor layer is
 enforced schema, not decoration: an agent actor without `model`, an
 unknown actor id, or attribution on a non-excluded option would all fail.
 
-**5 — Prove it is the same record**
+**6 — Prove it, then the payoff**
 
 > Diff /tmp/attributed.yaml against the committed
 > korean-pledges-demo/analysis/astra.yaml and summarize what the actor
-> layer added.
+> layer added. Then run env -u PYTHONPATH .venv/bin/astra info -f
+> korean-pledges-demo/analysis/astra.yaml -d and tell me who excluded
+> what, and when.
 
-Expected: the diff is essentially the ~30-line actor delta (registry + two
-attribution blocks) — the plain twin differs from the committed file by
-exactly the actor layer, so the audience sees the layer, not YAML noise.
+Expected: the diff is essentially the actor delta (registry + one
+attribution block), and `astra info` renders "proposed by claude_code;
+excluded by oliver (validation)" with the date and rationale.
 
-**6 — The payoff: who said no**
-
-> Run: env -u PYTHONPATH .venv/bin/astra info -f
-> korean-pledges-demo/analysis/astra.yaml -d
-> and tell me who excluded what, and when.
-
-Expected: on each excluded option, "proposed by claude_code; excluded by
-oliver (validation)" with the date and rationale. Closing line: without
-the actor layer the file says WHAT was excluded and why; with it, it says
-who proposed the tempting number, who refused it, and when.
+Closing line: the assistant proposed the theoretically better metric —
+the same answer it gave live in prompt 1. A human inspected the evidence
+and overruled it. Without the actor layer, the file only says Mahalanobis
+was excluded; with it, it says who proposed it, who overruled it, and
+when — the judgment call no metric could have made.
 
 ---
 
@@ -89,20 +105,17 @@ who proposed the tempting number, who refused it, and when.
 From `korean-pledges-demo/`:
 
 ```bash
-./run_demo.sh                        # 68/218 (31.2%)
+./run_demo.sh                          # accepted: 161/218 (73.9%)
+./run_demo.sh -u what-if-mahalanobis   # 68/218 (31.2%) + what it throws away
 cat > /tmp/bad-universe.yaml <<'EOF'
 id: bad_universe
 description: "scratch"
 
 decisions:
-  distance_metric: euclidean
-  threshold_rule: loo_alpha_01
+  distance_metric: mahalanobis
 EOF
 env -u PYTHONPATH ../.venv/bin/astra validate /tmp/bad-universe.yaml -a analysis/astra.yaml
-                                     # EXCLUDED_OPTION_SELECTED
-./run_demo.sh -u what-if-euclidean   # 161/218 (73.9%) + admitted sentences
-open analysis/examples/euclidean_extras.md
-./run_demo.sh -u what-if-chisq       # 114/218 (52.3%), demo recomputation
+                                       # EXCLUDED_OPTION_SELECTED
 diff analysis/plain/astra.yaml analysis/astra.yaml   # the actor-layer delta
 env -u PYTHONPATH ../.venv/bin/astra info -f analysis/astra.yaml -d
 ```

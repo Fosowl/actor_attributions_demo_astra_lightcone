@@ -23,7 +23,7 @@ NPZ = ROOT / "data" / "reference_stats.npz"
 YAML_TEXT = (ROOT / "analysis" / "astra.yaml").read_text() + (
     ROOT / "analysis" / "plain" / "astra.yaml"
 ).read_text()
-RUN_NAMES = ["baseline", "what-if-euclidean", "what-if-chisq"]
+RUN_NAMES = ["baseline", "what-if-mahalanobis"]
 
 
 def get_computed_values() -> tuple[set[str], set[str]]:

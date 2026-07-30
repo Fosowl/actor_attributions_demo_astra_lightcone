@@ -5,22 +5,29 @@
 # number quoted below is recomputed live by src/filter_pledges.py from the
 # committed data (tests/test_demo_numbers.py enforces this).
 #
-# Provenance: internal TRACE record on file, session trace_20260509_305aaf
-# (2026-05-09); the source record is not published with this artifact.
-# The full study also varied a third decision (out-of-sample centroid
-# correction); this demo hard-codes its accepted value: every distance is
-# measured from the pledge slice's own pooled centroid, with the reference
-# cluster supplying shape (covariance) and threshold — see README.
+# The decision this file records is a reversal: the shape-aware Mahalanobis
+# metric was the assumed-best choice on theoretical grounds, and was
+# excluded after inspection — its retention was implausibly low and the
+# quality of the retained set favored the simpler Euclidean filter, which
+# the final manuscript adopted. Provenance: internal TRACE record on file,
+# session trace_20260509_305aaf (the assumed-Mahalanobis state), and the
+# manuscript revision round of 2026-06-11 that directed and verified the
+# switch; source records are not published with this artifact.
+#
+# Constants this demo holds fixed (see README): the threshold rule
+# (99th-percentile reference leave-one-out quantile, alpha = 0.01) and the
+# location correction (distances measured from the pledge slice's pooled
+# centroid, with the reference cluster supplying shape and threshold).
 id: korean_pledges_actor_demo
 version: "0.0.13"
 name: "Korean Pledges Actor-Attribution Demo"
 container: python:3.12-slim
 description: |
   Decides which of the 218 out-of-sample Forest Bioenergy pledge sentences
-  are retained as genuinely belonging to the reference cluster. Retention
-  is the contested quantity: both excluded options below produce a HIGHER
-  retention than the accepted configuration, so every exclusion was a
-  decision to keep the less tempting number.
+  are retained as genuinely belonging to the reference cluster. The
+  contested decision is the distance metric: theory favored the
+  shape-aware option, the evidence favored the simple one, and a human had
+  to rule — which is exactly the judgment the actor layer records.
 tags:
   - actor-attribution
   - real-data
@@ -59,99 +66,64 @@ outputs:
   - id: retained_sentences
     type: data
     description: Pledge sentences admitted to the reference cluster.
-    decisions: [distance_metric, threshold_rule]
+    decisions: [distance_metric]
     recipe:
       command: >-
         python src/filter_pledges.py --metric {decisions.distance_metric}
-        --threshold {decisions.threshold_rule}
 
   - id: retention_rate
     type: metric
     description: >-
-      Share of the 218 sentences retained. Accepted configuration: 68/218
-      (31.2%). Both excluded options land far higher — that is the point.
+      Share of the 218 sentences retained. Accepted configuration: 161/218
+      (73.9%). The excluded, theoretically favored alternative would have
+      kept 68/218 (31.2%).
     inputs: [retained_sentences]
-    decisions: [distance_metric, threshold_rule]
+    decisions: [distance_metric]
     recipe:
       command: >-
         python src/filter_pledges.py --metric {decisions.distance_metric}
-        --threshold {decisions.threshold_rule}
 
 decisions:
   distance_metric:
     label: "Distance metric for cluster membership"
     rationale: >-
-      Decides whether the cluster's anisotropic shape counts when judging
-      whether a pledge belongs. Shape adaptation is load-bearing here, not
-      cosmetic: it is what keeps off-topic industrial-policy pledges out.
-    default: mahalanobis
+      The load-bearing choice, and a reversal of the theoretical prior:
+      shape-aware Mahalanobis should be better on paper, but with
+      per-cluster covariances estimated from small reference samples in 18
+      dimensions, its assumptions did not hold on this corpus. The
+      empirical results and a close reading of the retained sentences
+      settled the call in favor of the simple metric.
+    default: euclidean
     options:
-      mahalanobis:
-        label: "Mahalanobis distance"
-        description: >-
-          Uses the reference cluster's covariance; retains 68/218 (31.2%).
-          The harder-to-defend number, kept because it is the honest one.
       euclidean:
         label: "Euclidean distance"
         description: >-
-          Ignores cluster shape; retains 161/218 (73.9%) on the same
-          sentences with the same threshold rule.
+          The accepted filter: simple isotropic distance from the pooled
+          centroid; retains 161/218 (73.9%) on this cluster, in line with
+          plausible retention corpus-wide. Adopted by the final manuscript.
+      mahalanobis:
+        label: "Mahalanobis distance"
+        description: >-
+          Shape-aware distance using the reference cluster's ridged
+          covariance; retains 68/218 (31.2%) on the same sentences.
         excluded: true
         # exclusion_rationale is the attributed one-line judgment; excluded_reason
         # below is the fuller technical record. Both are part of the schema.
         proposed_by: {actor: claude_code, role: methodology}
         excluded_by: {actor: oliver, role: validation}
-        excluded_at: "2026-05-09"
+        excluded_at: "2026-06-11"
         exclusion_rationale: >-
-          The tempting number: more than twice the retention, from the
-          simplest metric. Rejected because qualitative reading showed the
-          extra sentences are off-topic (general industrial policy, not
-          forest bioenergy) — they survive only because Euclidean ignores
-          the cluster's elongated shape.
+          The assumed-best option, excluded after inspection: theoretically
+          superior shape adaptation, but retention was implausibly low and
+          reviewing the retained sentences showed the simple metric was
+          producing the better set. Theory needed a human override.
         excluded_reason: >-
-          Retains 161/218 (73.9%) vs 68/218 (31.2%) for Mahalanobis.
-          Qualitative review of the additionally admitted sentences found
-          general industrial-policy content (defense industry, electronics,
-          urban industrial complexes) that lands near the centroid only
-          along the cluster's dominant axis. A 42.7-point retention jump
-          from ignoring shape is the filter failing at its one job.
-
-  threshold_rule:
-    label: "Distance threshold"
-    rationale: >-
-      Sets the cut point, and therefore governs retention most directly —
-      the decision a reviewer will read as tuned if it is not principled.
-    default: loo_alpha_01
-    options:
-      loo_alpha_01:
-        label: "Empirical leave-one-out quantile, alpha = 0.01"
-        description: >-
-          99th percentile (NumPy linear quantile) of the reference
-          leave-one-out distance distribution — an empirical study
-          convention whose threshold carries the reference corpus's own
-          estimation noise; no distribution-free coverage guarantee is
-          claimed at this sample size.
-      chisq_shrinkage:
-        label: "Chi-squared cutoff on a shrinkage covariance, beta = 0.75"
-        description: >-
-          Blends reference and out-of-sample covariance (beta = 0.75) and
-          cuts at the chi-squared quantile; retains 114/218 (52.3%). That
-          value is this demo's recomputation on this cluster — the study
-          reported the variant corpus-wide, not per cluster.
-        requires: [distance_metric.mahalanobis]
-        excluded: true
-        proposed_by: {actor: claude_code, role: methodology}
-        excluded_by: {actor: oliver, role: validation}
-        excluded_at: "2026-05-09"
-        exclusion_rationale: >-
-          Also a higher number, rejected anyway: beta = 0.75 has no
-          principled basis, and the variant changes the threshold source
-          and the covariance source at once, so nothing can be attributed.
-        excluded_reason: >-
-          Retains 114/218 (52.3%) on this cluster, 21 points above the
-          accepted configuration. Rejected on three grounds: no principled
-          basis for beta = 0.75 over 0.6 or 0.85; threshold source and
-          covariance source change simultaneously, so the retention shift
-          cannot be attributed to either; and estimating part of the
-          covariance on the very points being scored abandons even the
-          empirical-calibration rationale of the accepted rule.
+          Retains 68/218 (31.2%) vs 161/218 (73.9%) for Euclidean on this
+          cluster — less than half the plausible rate, part of a
+          corpus-wide pattern of over-rejection under the shape-aware
+          metric. The per-cluster covariance behind it is estimated from
+          few reference points in 18 dimensions, so the shape it adapts to
+          is substantially estimation noise. Review of the retained and
+          discarded sentences during manuscript revision confirmed the
+          Euclidean set was superior, and the final manuscript adopted
+          Euclidean.

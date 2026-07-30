@@ -2,10 +2,9 @@
 # Run the Korean pledges demo: filter + ASTRA validation + actor display.
 #
 # Usage (from korean-pledges-demo/):
-#   ./run_demo.sh                        # baseline universe
-#   ./run_demo.sh -u what-if-euclidean   # a counterfactual, with sentence diff
-#   ./run_demo.sh -u what-if-chisq       # the other counterfactual
-#   ./run_demo.sh --validate             # astra validate + actor-attributed info
+#   ./run_demo.sh                          # accepted baseline (euclidean)
+#   ./run_demo.sh -u what-if-mahalanobis   # excluded-option replay, with diff
+#   ./run_demo.sh --validate               # astra validate + actor-attributed info
 #
 # Requires ../.venv from ../install_and_validate.sh; installs the demo's
 # Python deps into it idempotently.

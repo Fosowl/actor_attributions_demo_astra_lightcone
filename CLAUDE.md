@@ -63,7 +63,7 @@ Rules enforced by the semantic validator (astra-tools):
   (`{option_id: ..., selected_by: ..., reviewed_by: ...}`).
 - A universe may NOT select an excluded option (EXCLUDED_OPTION_SELECTED).
   Excluded branches are replayed diagnostically (e.g.
-  `run_demo.sh -u what-if-euclidean`), never as universes.
+  `run_demo.sh -u what-if-mahalanobis`), never as universes.
 - Recipe command placeholders: only `{inputs}`, `{inputs.<id>}`,
   `{decisions.<id>}`, `{output}`.
 
