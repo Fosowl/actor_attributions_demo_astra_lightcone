@@ -183,7 +183,12 @@ def get_config(universes_dir: Path, name: str) -> FilterConfig:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run one universe of the pledge filter demo.")
-    parser.add_argument("--universe", default=None, help="universe id under analysis/universes/")
+    parser.add_argument(
+        "--universe",
+        default=None,
+        help="run name: a universe id under analysis/universes/, or a "
+        "counterfactual preset (diagnostic replay of an excluded option)",
+    )
     parser.add_argument("--metric", default=None, choices=sorted(METRIC_OPTIONS))
     parser.add_argument("--threshold", default=None, choices=sorted(THRESHOLD_OPTIONS))
     parser.add_argument(

@@ -5,7 +5,6 @@ decisions:
   distance_metric:
     option_id: mahalanobis
     selected_by: {actor: oliver, role: methodology}
-    reviewed_by: {actor: claude_code, role: validation}
   threshold_rule:
     option_id: loo_alpha_01
     selected_by: {actor: oliver, role: methodology}

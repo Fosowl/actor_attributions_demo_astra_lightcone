@@ -6,6 +6,11 @@ run once. The committed `analysis/astra.yaml` is the reference output for
 prompt 4 — if the generated file differs, diff them on screen; that
 comparison is itself a good demo beat.
 
+Framing (say this once, before prompts 3-4): the committed
+`analysis/astra.yaml` is the record; the live generation re-derives it
+from facts stated in the prompts, which come from that record. The
+assistant formats provenance here — it does not invent it.
+
 **1 — Run the real pipeline**
 
 > Read korean-pledges-demo/README.md, then run ./run_demo.sh in
@@ -16,13 +21,15 @@ threshold.
 
 **2 — Show the real problem**
 
-> Now run ./run_demo.sh -u what-if-euclidean. Translate the first three
-> Korean sentences it retains that the baseline removes, and say whether
-> they belong in a "Forest Bioenergy" topic cluster.
+> Now run ./run_demo.sh -u what-if-euclidean. Then open
+> korean-pledges-demo/analysis/examples/euclidean_extras.md and tell me
+> whether the three sentences it lists belong in a "Forest Bioenergy"
+> topic cluster.
 
-Expected: retention jumps to 161/218 (73.9%); the translated sentences are
-about defense industry, urban parks, food/bio industry — off-topic. The
-tempting number admits junk.
+Expected: retention jumps to 161/218 (73.9%); the pre-translated sentences
+are about defense industry, urban parks, food/bio industry — off-topic.
+The tempting number admits junk. (Translations are committed so the demo
+does not depend on live translation quality.)
 
 **3 — Generate the decision record**
 
@@ -49,14 +56,16 @@ committed korean-pledges-demo/analysis/astra.yaml.
 
 **5 — Prove it**
 
-> Validate the file with the astra CLI from .venv, then run
-> astra info -f on it with -d and show me who excluded what.
+> Validate the generated file, then the committed one, with:
+> ../.venv/bin/astra validate <file>
+> and show who excluded what with:
+> ../.venv/bin/astra info -f korean-pledges-demo/analysis/astra.yaml -d
 
 Expected: validation green (the actor layer is enforced, not decorative);
 `astra info` renders the actor registry and, on each excluded option,
-"proposed by claude_code; excluded by oliver".
+"proposed by claude_code; excluded by oliver (validation)".
 
-**Optional encore — enforcement is real**
+**6 — Enforcement encore (recommended, 30 seconds)**
 
 > Create a universe file that selects the excluded euclidean option and
 > validate it against the analysis.

@@ -39,21 +39,34 @@ this pipeline computes from `data/`.
 ASTRA refuses a universe that selects an excluded option
 (`EXCLUDED_OPTION_SELECTED`) — the excluded branches are out of the valid
 multiverse by construction. So `analysis/universes/` holds only the
-accepted `baseline`, and the two what-if runs execute through ASTRA's other
-form: explicit decision values, exactly as the recipe commands in
-`analysis/astra.yaml` declare them. The refusal is enforcement working,
-not a limitation.
+accepted `baseline`. The two what-if runs are **diagnostic replays, not
+ASTRA universes**: ASTRA validation still rejects them as selectable
+analysis branches, and the demo executes them only to show what the
+excluded options would have retained (they pass explicit decision values
+to the filter, the same values the recipe commands in `analysis/astra.yaml`
+parameterize over). The refusal is enforcement working, not a limitation.
+
+| Run | Retained | Relation to the study |
+|---|---:|---|
+| baseline (mahalanobis + LOO p99) | 68/218 (31.2%) | exact per-cluster study value, per-sentence tested |
+| what-if-euclidean | 161/218 (73.9%) | exact per-cluster study value, per-sentence tested |
+| what-if-chisq (shrinkage beta 0.75) | 114/218 (52.3%) | demo recomputation on this cluster; the study reported this variant corpus-wide |
 
 ## What was simplified
 
 - The full study varies a third decision (out-of-sample centroid
-  correction); this demo hard-codes its accepted value (pooled).
+  correction); this demo hard-codes its accepted value. That correction is
+  itself load-bearing: every distance is measured from the pledge slice's
+  own pooled centroid, with the reference cluster supplying shape
+  (covariance) and threshold. The reference centroid does not anchor
+  membership — the reference cluster's geometry does.
 - The full study covers 8 clusters and 1,662 sentences; this demo ships
-  the one cluster where the metric choice matters most. The committed
-  slice is complete for that cluster, so the two headline numbers here
-  are the study's real per-cluster values, not approximations. (The
-  chi-squared counterfactual is recomputed on this cluster by the same
-  code path; the study reported that variant corpus-wide.)
+  the one cluster where the metric choice matters most. Completeness of
+  the slice keeps the pooled centroid identical to the study's; exactness
+  of the two headline numbers is then verified per-sentence against the
+  study's recorded keep/remove decisions (218/218 agreement, enforced by
+  tests). The chi-squared counterfactual is a demo recomputation on this
+  cluster; the study reported that variant corpus-wide.
 
 ## Data
 
@@ -64,4 +77,6 @@ not a limitation.
   no reference text.
 - The source corpus is private to the originating research group;
   `tools/make_subset.py` regenerates these files for anyone with access.
-- Decision provenance: TRACE session trace_20260509_305aaf (2026-05-09).
+- Decision provenance: internal TRACE record on file, session
+  trace_20260509_305aaf (2026-05-09); the source record is not published
+  with this artifact.

@@ -5,10 +5,12 @@
 # number quoted below is recomputed live by src/filter_pledges.py from the
 # committed data (tests/test_demo_numbers.py enforces this).
 #
-# Provenance: the exclusions encoded here were logged in TRACE session
-# trace_20260509_305aaf (2026-05-09). The full study also varied a third
-# decision (out-of-sample centroid correction); this demo hard-codes its
-# accepted value (pooled) — see README.
+# Provenance: internal TRACE record on file, session trace_20260509_305aaf
+# (2026-05-09); the source record is not published with this artifact.
+# The full study also varied a third decision (out-of-sample centroid
+# correction); this demo hard-codes its accepted value: every distance is
+# measured from the pledge slice's own pooled centroid, with the reference
+# cluster supplying shape (covariance) and threshold — see README.
 id: korean_pledges_actor_demo
 version: "0.0.13"
 name: "Korean Pledges Actor-Attribution Demo"
@@ -95,7 +97,9 @@ decisions:
           Ignores cluster shape; retains 161/218 (73.9%) on the same
           sentences with the same threshold rule.
         excluded: true
-        proposed_by: claude_code
+        # exclusion_rationale is the attributed one-line judgment; excluded_reason
+        # below is the fuller technical record. Both are part of the schema.
+        proposed_by: {actor: claude_code, role: methodology}
         excluded_by: {actor: oliver, role: validation}
         excluded_at: "2026-05-09"
         exclusion_rationale: >-
@@ -122,18 +126,21 @@ decisions:
       loo_alpha_01:
         label: "Empirical leave-one-out quantile, alpha = 0.01"
         description: >-
-          99th percentile of the reference leave-one-out distance
-          distribution — the threshold carries the reference corpus's own
-          estimation noise.
+          99th percentile (NumPy linear quantile) of the reference
+          leave-one-out distance distribution — an empirical study
+          convention whose threshold carries the reference corpus's own
+          estimation noise; no distribution-free coverage guarantee is
+          claimed at this sample size.
       chisq_shrinkage:
-        label: "Chi-squared theoretical threshold, shrinkage covariance beta = 0.75"
+        label: "Chi-squared cutoff on a shrinkage covariance, beta = 0.75"
         description: >-
           Blends reference and out-of-sample covariance (beta = 0.75) and
-          cuts at the theoretical chi-squared quantile; retains 114/218
-          (52.3%).
+          cuts at the chi-squared quantile; retains 114/218 (52.3%). That
+          value is this demo's recomputation on this cluster — the study
+          reported the variant corpus-wide, not per cluster.
         requires: [distance_metric.mahalanobis]
         excluded: true
-        proposed_by: claude_code
+        proposed_by: {actor: claude_code, role: methodology}
         excluded_by: {actor: oliver, role: validation}
         excluded_at: "2026-05-09"
         exclusion_rationale: >-
@@ -145,6 +152,6 @@ decisions:
           accepted configuration. Rejected on three grounds: no principled
           basis for beta = 0.75 over 0.6 or 0.85; threshold source and
           covariance source change simultaneously, so the retention shift
-          cannot be attributed to either; and the conformal coverage
-          guarantee does not extend to a covariance estimated on the test
-          corpus.
+          cannot be attributed to either; and estimating part of the
+          covariance on the very points being scored abandons even the
+          empirical-calibration rationale of the accepted rule.
