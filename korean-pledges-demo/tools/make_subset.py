@@ -8,8 +8,18 @@ with access to the private working tree.
 
 Inputs (via --source-dir, the private working tree):
   data_may7_2026/projections/{Lee,Park,Moon}_projection.xlsx
-  for_hyein/projection/deliverable/reference_consensus_embeddings.npz
+  for_hyein/embeddings6_projected.csv
   for_hyein/park_moon_results_2026-05-07_v2/all_five_variants_filtered.xlsx
+
+Reference-statistics conventions (verified point-level against the study's
+per-sentence keep decisions; every choice below is load-bearing):
+  - reference coordinates AND cluster labels come from
+    embeddings6_projected.csv (the deliverable npz holds a different
+    projection version and does NOT reproduce the study's distances)
+  - covariance: np.cov(cluster points) + 1e-6 * I (ridge)
+  - Mahalanobis LOO distribution: leave each reference point out, recompute
+    centroid AND ridged covariance, squared distance
+  - Euclidean LOO distribution: leave-one-out centroid only, non-squared
 
 Outputs (side effects — writes into the repo):
   data/pledges_subset.csv               real sentences, complete cluster-6 slice
@@ -33,6 +43,9 @@ DIM_COLS = [f"D{i}" for i in range(1, 19)]
 TARGET_CLUSTER_1IDX = 6
 EXPECTED_N = 218  # study ground truth for cluster 6
 KEEP_COLS = ["sentence_id", "text_sentence", "president", "cluster", *DIM_COLS]
+
+# Study convention: per-cluster covariance is ridged (see module docstring).
+RIDGE_EPS = 1e-6
 
 # Column names in the study's per-point five-variant results file.
 STUDY_KEEP_MAHAL = "keep_M_pooled_p99"
@@ -79,21 +92,22 @@ def get_oos_frame(source_dir: Path) -> pd.DataFrame:
     return oos
 
 
-def get_reference_stats(npz_path: Path, cluster_1idx: int) -> dict[str, np.ndarray]:
-    """Derive per-cluster reference statistics from the consensus embeddings.
+def get_reference_stats(ref_csv_path: Path, cluster_1idx: int) -> dict[str, np.ndarray]:
+    """Derive per-cluster reference statistics from the projected reference corpus.
 
-    Returns mu_ref, cov_ref, and the sorted leave-one-out Mahalanobis-D^2 and
-    Euclidean distance distributions for the target cluster. LOO means: for
-    each reference point j in the cluster, distance of x_j to the centroid and
-    covariance estimated WITHOUT x_j.
+    Returns mu_ref, the ridged cov_ref, and the sorted leave-one-out distance
+    distributions for the target cluster, using the study's exact conventions
+    (see module docstring): Mahalanobis LOO recomputes centroid and ridged
+    covariance per held-out point (squared distances); Euclidean LOO recomputes
+    the centroid only (non-squared distances).
     """
-    z = np.load(npz_path)
-    for key in ("consensus_18d", "cluster_labels"):
-        if key not in z.files:
-            raise KeyError(f"{npz_path.name}: missing key {key}")
-    coords = z["consensus_18d"].astype(np.float64)
-    labels = np.asarray(z["cluster_labels"]).astype(int)
-    labels_1idx = labels + 1 if labels.min() == 0 else labels
+    ref = pd.read_csv(ref_csv_path)
+    missing = [c for c in ("cluster_k", *DIM_COLS) if c not in ref.columns]
+    if missing:
+        raise ValueError(f"{ref_csv_path.name}: missing expected columns {missing}")
+    coords = ref[DIM_COLS].to_numpy(dtype=np.float64)
+    labels = ref["cluster_k"].to_numpy()
+    labels_1idx = labels + 1 if int(cast(Any, labels.min())) == 0 else labels
     points = coords[labels_1idx == cluster_1idx]
     n_ref = points.shape[0]
     if n_ref <= coords.shape[1] + 1:
@@ -101,18 +115,19 @@ def get_reference_stats(npz_path: Path, cluster_1idx: int) -> dict[str, np.ndarr
             f"cluster {cluster_1idx}: n_ref={n_ref} too small for a "
             f"non-singular {coords.shape[1]}-d covariance"
         )
+    dim = coords.shape[1]
     loo_mahal_d2 = np.empty(n_ref)
     loo_eucl_d = np.empty(n_ref)
     for j in range(n_ref):
         rest = np.delete(points, j, axis=0)
         mu_j = rest.mean(axis=0)
-        cov_j = np.cov(rest, rowvar=False)
+        cov_j = np.cov(rest, rowvar=False) + RIDGE_EPS * np.eye(dim)
         diff = points[j] - mu_j
         loo_mahal_d2[j] = float(diff @ np.linalg.inv(cov_j) @ diff)
         loo_eucl_d[j] = float(np.linalg.norm(diff))
     return {
         "mu_ref": points.mean(axis=0),
-        "cov_ref": np.cov(points, rowvar=False),
+        "cov_ref": np.cov(points, rowvar=False) + RIDGE_EPS * np.eye(dim),
         "loo_mahal_d2": np.sort(loo_mahal_d2),
         "loo_eucl_d": np.sort(loo_eucl_d),
         "n_ref": np.asarray(n_ref),
@@ -180,11 +195,7 @@ def main() -> None:
         )
 
     stats = get_reference_stats(
-        args.source_dir
-        / "for_hyein"
-        / "projection"
-        / "deliverable"
-        / "reference_consensus_embeddings.npz",
+        args.source_dir / "for_hyein" / "embeddings6_projected.csv",
         TARGET_CLUSTER_1IDX,
     )
     expected = get_expected_decisions(
