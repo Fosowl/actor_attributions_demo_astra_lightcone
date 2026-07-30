@@ -1,9 +1,14 @@
-# Live-demo script (chat-first)
+# Demo script — walking the finished record
 
-Six short prompts for an agentic coding assistant (e.g. Claude Code)
-opened at the **repo root**. The root `CLAUDE.md` primes it with the
-actor-layer rules and the right commands, so the prompts can stay short —
-the assistant runs everything itself.
+Prompts for an agentic coding assistant (e.g. Claude Code) opened at the
+**repo root**, walking through the record this directory already
+contains. The root `CLAUDE.md` primes it with the actor-layer rules and
+commands, so the prompts stay short.
+
+> For the **from-scratch version** — where the assistant works the
+> decision out and writes the ASTRA file live, with no finished record in
+> reach — use [`../live-demo/`](../live-demo/) instead. That is the one
+> to run in front of an audience.
 
 Prereq: `./install_and_validate.sh` has been run once.
 
