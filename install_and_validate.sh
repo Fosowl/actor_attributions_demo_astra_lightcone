@@ -42,17 +42,38 @@ command -v uv >/dev/null 2>&1 \
 # astra-tools pin. Best-effort: offline is fine if tags are already present.
 git -C "$SPEC" fetch --tags --quiet origin 2>/dev/null || true
 
-echo "==> Installing astra-spec + astra-tools (editable) into $VENV"
+echo "==> Installing astra-spec + astra-tools into $VENV"
 [ -d "$VENV" ] || uv venv --quiet "$VENV"
-# One resolution with both local editables: the local astra-spec satisfies
-# astra-tools' astra-spec pin, so nothing is pulled from PyPI for it.
-uv pip install --quiet -p "$VENV" -e "$SPEC" -e "$TOOLS[dev]"
+# Installed as real packages, not editable. Editable installs write .pth files,
+# macOS flags them UF_HIDDEN, and CPython >= 3.11 skips hidden .pth files without
+# warning, which silently turns the install into a no-op after it has already
+# reported success. --no-sources is required: astra-tools' [tool.uv.sources]
+# pins astra-spec to the sibling path as editable, which would reintroduce the
+# .pth indirection even here. Both paths are passed explicitly, so the local
+# astra-spec still satisfies astra-tools' pin and nothing comes from PyPI.
+uv pip install --quiet --no-sources -p "$VENV" "$SPEC" "$TOOLS[dev]"
+
+# Prove the venv itself imports, with no PYTHONPATH rescue and no source tree on
+# the path. A demo harness that only works via ambient environment is not proof.
+env -u PYTHONPATH "$VENV/bin/python" - <<'PY' || fail "venv cannot import astra; the install did not take"
+import importlib.util
+import sys
+
+spec = importlib.util.find_spec("astra")
+if spec is None or not spec.submodule_search_locations:
+    sys.exit("astra is not importable")
+if not any("site-packages" in p for p in spec.submodule_search_locations):
+    sys.exit(f"astra resolves outside site-packages: {list(spec.submodule_search_locations)}")
+import astra.cli  # noqa: F401
+import astra.datamodel.analysis  # noqa: F401
+PY
 
 ASTRA="$VENV/bin/astra"
-echo "==> $("$ASTRA" --version) | astra-spec $("$VENV/bin/python" -c 'from importlib.metadata import version; print(version("astra-spec"))')"
+astra_run() { env -u PYTHONPATH "$ASTRA" "$@"; }
+echo "==> $(astra_run --version) | astra-spec $(env -u PYTHONPATH "$VENV/bin/python" -c 'from importlib.metadata import version; print(version("astra-spec"))')"
 
 # Smoke check: the actor layer is present iff the schema serves the concept.
-if "$ASTRA" spec actor >/dev/null 2>&1; then
+if astra_run spec actor >/dev/null 2>&1; then
   echo "==> Actor layer (RFC-0003) present: astra spec actor OK"
 else
   echo "==> NOTE: this astra-spec checkout has no Actor concept —"
@@ -63,7 +84,7 @@ fi
 
 echo
 echo "==> Validating $TARGET"
-"$ASTRA" validate "$TARGET"
+astra_run validate "$TARGET"
 
 # Validate sibling universes, if the conventional directory exists.
 UNIVERSES="$(dirname "$TARGET")/universes"
@@ -72,14 +93,14 @@ if [ -d "$UNIVERSES" ]; then
     [ -e "$u" ] || continue
     echo
     echo "==> Validating universe $u"
-    "$ASTRA" validate "$u" -a "$TARGET"
+    astra_run validate "$u" -a "$TARGET"
   done
 fi
 
 if [ "$RUN_SUITE" = 1 ]; then
   echo
   echo "==> Running astra-tools test suite"
-  (cd "$TOOLS" && "$VENV/bin/python" -m pytest -q)
+  (cd "$TOOLS" && env -u PYTHONPATH "$VENV/bin/python" -m pytest -q)
   echo "    (astra-spec's own suite needs the linkml toolchain: cd astra-spec && uv run pytest)"
 fi
 
