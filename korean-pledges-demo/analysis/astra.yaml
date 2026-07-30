@@ -1,0 +1,150 @@
+# ASTRA Analysis Specification — Korean pledges actor-attribution demo
+#
+# A simplified, runnable slice of a real study: filtering out-of-sample
+# Korean forest-policy pledge sentences against a reference corpus. Every
+# number quoted below is recomputed live by src/filter_pledges.py from the
+# committed data (tests/test_demo_numbers.py enforces this).
+#
+# Provenance: the exclusions encoded here were logged in TRACE session
+# trace_20260509_305aaf (2026-05-09). The full study also varied a third
+# decision (out-of-sample centroid correction); this demo hard-codes its
+# accepted value (pooled) — see README.
+id: korean_pledges_actor_demo
+version: "0.0.13"
+name: "Korean Pledges Actor-Attribution Demo"
+container: python:3.12-slim
+description: |
+  Decides which of the 218 out-of-sample Forest Bioenergy pledge sentences
+  are retained as genuinely belonging to the reference cluster. Retention
+  is the contested quantity: both excluded options below produce a HIGHER
+  retention than the accepted configuration, so every exclusion was a
+  decision to keep the less tempting number.
+tags:
+  - actor-attribution
+  - real-data
+  - example
+
+# Who was on this analysis's decisions (RFC-0003 actor layer).
+actors:
+  oliver:
+    type: human
+  claude_code:
+    type: agent
+    # Model id supplied by the researcher; the original working sessions
+    # predate model-id capture in the provenance record.
+    model: claude-opus-4-8
+    harness: claude-code
+    version: "2026-05"
+
+inputs:
+  - id: pledges_subset
+    type: data
+    source: "data/pledges_subset.csv"
+    description: >-
+      Complete slice of the 218 out-of-sample pledge sentences assigned to
+      the Forest Bioenergy reference cluster (three presidencies; Korean
+      text plus 18-d projected coordinates).
+
+  - id: reference_stats
+    type: data
+    source: "data/reference_stats.npz"
+    description: >-
+      Derived statistics of the reference planning corpus for this cluster:
+      centroid, ridged covariance, and leave-one-out distance
+      distributions. No reference text is distributed.
+
+outputs:
+  - id: retained_sentences
+    type: data
+    description: Pledge sentences admitted to the reference cluster.
+    decisions: [distance_metric, threshold_rule]
+    recipe:
+      command: >-
+        python src/filter_pledges.py --metric {decisions.distance_metric}
+        --threshold {decisions.threshold_rule}
+
+  - id: retention_rate
+    type: metric
+    description: >-
+      Share of the 218 sentences retained. Accepted configuration: 68/218
+      (31.2%). Both excluded options land far higher — that is the point.
+    inputs: [retained_sentences]
+    decisions: [distance_metric, threshold_rule]
+    recipe:
+      command: >-
+        python src/filter_pledges.py --metric {decisions.distance_metric}
+        --threshold {decisions.threshold_rule}
+
+decisions:
+  distance_metric:
+    label: "Distance metric for cluster membership"
+    rationale: >-
+      Decides whether the cluster's anisotropic shape counts when judging
+      whether a pledge belongs. Shape adaptation is load-bearing here, not
+      cosmetic: it is what keeps off-topic industrial-policy pledges out.
+    default: mahalanobis
+    options:
+      mahalanobis:
+        label: "Mahalanobis distance"
+        description: >-
+          Uses the reference cluster's covariance; retains 68/218 (31.2%).
+          The harder-to-defend number, kept because it is the honest one.
+      euclidean:
+        label: "Euclidean distance"
+        description: >-
+          Ignores cluster shape; retains 161/218 (73.9%) on the same
+          sentences with the same threshold rule.
+        excluded: true
+        proposed_by: claude_code
+        excluded_by: {actor: oliver, role: validation}
+        excluded_at: "2026-05-09"
+        exclusion_rationale: >-
+          The tempting number: more than twice the retention, from the
+          simplest metric. Rejected because qualitative reading showed the
+          extra sentences are off-topic (general industrial policy, not
+          forest bioenergy) — they survive only because Euclidean ignores
+          the cluster's elongated shape.
+        excluded_reason: >-
+          Retains 161/218 (73.9%) vs 68/218 (31.2%) for Mahalanobis.
+          Qualitative review of the additionally admitted sentences found
+          general industrial-policy content (defense industry, electronics,
+          urban industrial complexes) that lands near the centroid only
+          along the cluster's dominant axis. A 42.7-point retention jump
+          from ignoring shape is the filter failing at its one job.
+
+  threshold_rule:
+    label: "Distance threshold"
+    rationale: >-
+      Sets the cut point, and therefore governs retention most directly —
+      the decision a reviewer will read as tuned if it is not principled.
+    default: loo_alpha_01
+    options:
+      loo_alpha_01:
+        label: "Empirical leave-one-out quantile, alpha = 0.01"
+        description: >-
+          99th percentile of the reference leave-one-out distance
+          distribution — the threshold carries the reference corpus's own
+          estimation noise.
+      chisq_shrinkage:
+        label: "Chi-squared theoretical threshold, shrinkage covariance beta = 0.75"
+        description: >-
+          Blends reference and out-of-sample covariance (beta = 0.75) and
+          cuts at the theoretical chi-squared quantile; retains 114/218
+          (52.3%).
+        requires: [distance_metric.mahalanobis]
+        excluded: true
+        proposed_by: claude_code
+        excluded_by: {actor: oliver, role: validation}
+        excluded_at: "2026-05-09"
+        exclusion_rationale: >-
+          Also a higher number, rejected anyway: beta = 0.75 has no
+          principled basis, and the variant changes the threshold source
+          and the covariance source at once, so nothing can be attributed.
+        excluded_reason: >-
+          Retains 114/218 (52.3%) on this cluster, 21 points above the
+          accepted configuration. Rejected on three grounds: no principled
+          basis for beta = 0.75 over 0.6 or 0.85; threshold source and
+          covariance source change simultaneously, so the retention shift
+          cannot be attributed to either; and the conformal coverage
+          guarantee does not extend to a covariance estimated on the test
+          corpus.

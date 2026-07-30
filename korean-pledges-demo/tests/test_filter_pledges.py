@@ -14,6 +14,7 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from filter_pledges import (  # noqa: E402
     FilterConfig,
+    get_config,
     get_keep_mask,
     get_reference_stats,
     get_retention,
@@ -73,14 +74,21 @@ def test_chisq_requires_mahalanobis():
         get_retention(CSV, NPZ, cfg)
 
 
-def test_universe_files_drive_the_filter():
+def test_universe_file_and_presets_drive_the_filter():
+    """baseline resolves from the ASTRA universe file; counterfactuals from
+    presets (the toolchain refuses a universe selecting an excluded option,
+    so the what-ifs are deliberately not universe files)."""
     universes = ROOT / "analysis" / "universes"
     if not any(universes.glob("*.yaml")):
         pytest.skip("analysis/ not built yet (Task 3)")
     assert get_universe_config(universes, "baseline") == MAHAL
-    assert get_universe_config(universes, "what-if-euclidean") == EUCL
+    assert get_config(universes, "baseline") == MAHAL
+    assert get_config(universes, "what-if-euclidean") == EUCL
+    assert get_config(universes, "what-if-chisq") == FilterConfig(
+        metric="mahalanobis", threshold="chisq_shrinkage"
+    )
 
 
 def test_unknown_universe_raises():
     with pytest.raises(FileNotFoundError):
-        get_universe_config(ROOT / "analysis" / "universes", "nonexistent")
+        get_config(ROOT / "analysis" / "universes", "nonexistent")

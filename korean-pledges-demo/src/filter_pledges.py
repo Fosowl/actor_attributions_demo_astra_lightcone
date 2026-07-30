@@ -37,6 +37,16 @@ RIDGE_EPS = 1e-6
 METRIC_OPTIONS = {"mahalanobis": "mahalanobis", "euclidean": "euclidean"}
 THRESHOLD_OPTIONS = {"loo_alpha_01": "loo_alpha_01", "chisq_shrinkage": "chisq_shrinkage"}
 
+# Counterfactual presets. These are deliberately NOT committed as ASTRA
+# universe files: the toolchain refuses a universe that selects an excluded
+# option (EXCLUDED_OPTION_SELECTED), which is exactly the enforcement this
+# demo showcases. The counterfactuals therefore run through ASTRA's other
+# form — explicit decision values, as in the analysis recipe commands.
+WHAT_IF_PRESETS: dict[str, dict[str, str]] = {
+    "what-if-euclidean": {"metric": "euclidean", "threshold": "loo_alpha_01"},
+    "what-if-chisq": {"metric": "mahalanobis", "threshold": "chisq_shrinkage"},
+}
+
 
 class FilterConfig(BaseModel):
     """One point in the demo's decision space (a universe)."""
@@ -159,9 +169,23 @@ def get_universe_config(universes_dir: Path, universe_id: str) -> FilterConfig:
     )
 
 
+def get_config(universes_dir: Path, name: str) -> FilterConfig:
+    """Resolve a run name: an ASTRA universe file first, then a counterfactual preset."""
+    if (universes_dir / f"{name}.yaml").exists():
+        return get_universe_config(universes_dir, name)
+    if name in WHAT_IF_PRESETS:
+        return FilterConfig(**WHAT_IF_PRESETS[name])  # type: ignore[arg-type]
+    raise FileNotFoundError(
+        f"unknown run {name!r}: no universe file in {universes_dir} and no "
+        f"counterfactual preset (have: {sorted(WHAT_IF_PRESETS)})"
+    )
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run one universe of the pledge filter demo.")
-    parser.add_argument("--universe", default="baseline")
+    parser.add_argument("--universe", default=None, help="universe id under analysis/universes/")
+    parser.add_argument("--metric", default=None, choices=sorted(METRIC_OPTIONS))
+    parser.add_argument("--threshold", default=None, choices=sorted(THRESHOLD_OPTIONS))
     parser.add_argument(
         "--show-diff",
         action="store_true",
@@ -173,16 +197,27 @@ def main() -> None:
     npz_path = root / "data" / "reference_stats.npz"
     universes = root / "analysis" / "universes"
 
-    config = get_universe_config(universes, args.universe)
+    # Two entry forms: --universe <id> (reads the ASTRA universe file), or the
+    # ASTRA recipe form --metric X --threshold Y (both flags required together).
+    if (args.metric is None) != (args.threshold is None):
+        parser.error("--metric and --threshold must be given together")
+    if args.metric is not None:
+        if args.universe is not None:
+            parser.error("give either --universe or --metric/--threshold, not both")
+        label = "(from decision flags)"
+        config = FilterConfig(metric=args.metric, threshold=args.threshold)
+    else:
+        label = args.universe or "baseline"
+        config = get_config(universes, label)
     result = get_retention(csv_path, npz_path, config)
     stats = get_reference_stats(npz_path)
-    print(f"universe: {args.universe}   (metric={config.metric}, threshold={config.threshold})")
+    print(f"universe: {label}   (metric={config.metric}, threshold={config.threshold})")
     print(
         f"cluster {stats.cluster_1idx} (Forest Bioenergy): "
         f"retained {result.kept}/{result.n} ({result.pct}%)"
     )
 
-    if args.show_diff and args.universe != "baseline":
+    if args.show_diff and label != "baseline":
         df = load_subset(csv_path)
         coords = df[DIM_COLS].to_numpy(dtype=np.float64)
         here = get_keep_mask(coords, stats, config)
