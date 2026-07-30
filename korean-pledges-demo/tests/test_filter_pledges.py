@@ -27,24 +27,24 @@ CSV = ROOT / "data" / "pledges_subset.csv"
 NPZ = ROOT / "data" / "reference_stats.npz"
 EXPECTED = ROOT / "tests" / "fixtures" / "expected_cluster6.csv"
 
-MAHAL = FilterConfig(metric="mahalanobis", threshold="loo_alpha_01")
-EUCL = FilterConfig(metric="euclidean", threshold="loo_alpha_01")
+EUCL = FilterConfig(metric="euclidean")
+MAHAL = FilterConfig(metric="mahalanobis")
 
 
 def test_counts_match_study_ground_truth():
-    assert get_retention(CSV, NPZ, MAHAL).kept == 68
     assert get_retention(CSV, NPZ, EUCL).kept == 161
+    assert get_retention(CSV, NPZ, MAHAL).kept == 68
 
 
 def test_pct_rounding():
-    r = get_retention(CSV, NPZ, MAHAL)
-    assert (r.n, r.pct) == (218, 31.2)
-    assert get_retention(CSV, NPZ, EUCL).pct == 73.9
+    r = get_retention(CSV, NPZ, EUCL)
+    assert (r.n, r.pct) == (218, 73.9)
+    assert get_retention(CSV, NPZ, MAHAL).pct == 31.2
 
 
 @pytest.mark.parametrize(
     "config,column",
-    [(MAHAL, "keep_mahalanobis_pooled"), (EUCL, "keep_euclidean_pooled")],
+    [(EUCL, "keep_euclidean_pooled"), (MAHAL, "keep_mahalanobis_pooled")],
 )
 def test_point_level_agreement_with_study(config: FilterConfig, column: str):
     """Every single sentence must get the same keep/remove as the study."""
@@ -62,31 +62,17 @@ def test_point_level_agreement_with_study(config: FilterConfig, column: str):
     )
 
 
-def test_chisq_universe_runs_and_is_between_extremes():
-    cfg = FilterConfig(metric="mahalanobis", threshold="chisq_shrinkage")
-    r = get_retention(CSV, NPZ, cfg)
-    assert r.n == 218 and 0 < r.kept < 218
-
-
-def test_chisq_requires_mahalanobis():
-    cfg = FilterConfig(metric="euclidean", threshold="chisq_shrinkage")
-    with pytest.raises(ValueError, match="mahalanobis"):
-        get_retention(CSV, NPZ, cfg)
-
-
 def test_universe_file_and_presets_drive_the_filter():
-    """baseline resolves from the ASTRA universe file; counterfactuals from
-    presets (the toolchain refuses a universe selecting an excluded option,
-    so the what-ifs are deliberately not universe files)."""
+    """baseline (the accepted euclidean filter) resolves from the ASTRA
+    universe file; the mahalanobis counterfactual from a preset (the
+    toolchain refuses a universe selecting an excluded option, so the
+    what-if is deliberately not a universe file)."""
     universes = ROOT / "analysis" / "universes"
     if not any(universes.glob("*.yaml")):
-        pytest.skip("analysis/ not built yet (Task 3)")
-    assert get_universe_config(universes, "baseline") == MAHAL
-    assert get_config(universes, "baseline") == MAHAL
-    assert get_config(universes, "what-if-euclidean") == EUCL
-    assert get_config(universes, "what-if-chisq") == FilterConfig(
-        metric="mahalanobis", threshold="chisq_shrinkage"
-    )
+        pytest.skip("analysis/ not built yet")
+    assert get_universe_config(universes, "baseline") == EUCL
+    assert get_config(universes, "baseline") == EUCL
+    assert get_config(universes, "what-if-mahalanobis") == MAHAL
 
 
 def test_unknown_universe_raises():

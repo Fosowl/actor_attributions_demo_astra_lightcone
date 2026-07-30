@@ -1,10 +1,7 @@
 id: baseline
-description: "The study's accepted configuration: shape-aware and conservative."
+description: "The manuscript's accepted configuration: the simple metric that won on evidence."
 
 decisions:
   distance_metric:
-    option_id: mahalanobis
-    selected_by: {actor: oliver, role: methodology}
-  threshold_rule:
-    option_id: loo_alpha_01
+    option_id: euclidean
     selected_by: {actor: oliver, role: methodology}

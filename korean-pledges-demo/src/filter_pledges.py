@@ -3,15 +3,20 @@
 Recomputes, live, the study's out-of-sample filter on the committed
 cluster-6 slice. Pure functions; the only side effect is CLI printing.
 
-The location-correction decision from the full study is hard-coded to its
-accepted value: distances are measured from the pooled OOS centroid (the
-mean of the committed cluster-6 coordinates) using the REFERENCE cluster's
-ridged covariance (np.cov + 1e-6*I, the study's stabilizer — carried inside
-data/reference_stats.npz). Thresholds come from the reference leave-one-out
-distance distribution (empirical, alpha=0.01) or the chi-squared theoretical
-quantile with shrinkage covariance (beta=0.75), matching the study. The
-loo_alpha_01 paths reproduce the study's per-sentence keep decisions exactly
-(enforced by tests/test_filter_pledges.py).
+The manuscript's accepted filter is EUCLIDEAN + pooled location correction
+at alpha = 0.01. Mahalanobis was the theoretically assumed choice (shape
+adaptation) and was excluded after inspection; it survives here as a
+diagnostic replay so the demo can show what it would have discarded.
+
+Conventions (verified point-level against the study's per-sentence keep
+decisions; enforced by tests/test_filter_pledges.py):
+- Distances are measured from the pledge slice's own pooled centroid; the
+  reference cluster supplies shape and threshold.
+- Thresholds are the 99th percentile (NumPy linear quantile) of the
+  reference leave-one-out distance distribution for the matching metric.
+- The reference covariance for the Mahalanobis replay is ridged
+  (np.cov + 1e-6*I, the study's stabilizer — carried inside
+  data/reference_stats.npz).
 """
 
 from __future__ import annotations
@@ -24,18 +29,11 @@ import numpy as np
 import pandas as pd
 import yaml
 from pydantic import BaseModel, ConfigDict
-from scipy.stats import chi2
 
 DIM_COLS = [f"D{i}" for i in range(1, 19)]
 
-# Study convention: covariances are stabilized with a small ridge. The
-# reference covariance in reference_stats.npz is already ridged; the OOS
-# covariance (shrinkage variant only) gets the same treatment here.
-RIDGE_EPS = 1e-6
-
 # ASTRA option id -> config value, per analysis/astra.yaml
-METRIC_OPTIONS = {"mahalanobis": "mahalanobis", "euclidean": "euclidean"}
-THRESHOLD_OPTIONS = {"loo_alpha_01": "loo_alpha_01", "chisq_shrinkage": "chisq_shrinkage"}
+METRIC_OPTIONS = {"euclidean": "euclidean", "mahalanobis": "mahalanobis"}
 
 # Counterfactual presets. These are deliberately NOT committed as ASTRA
 # universe files: the toolchain refuses a universe that selects an excluded
@@ -43,19 +41,16 @@ THRESHOLD_OPTIONS = {"loo_alpha_01": "loo_alpha_01", "chisq_shrinkage": "chisq_s
 # demo showcases. The counterfactuals therefore run through ASTRA's other
 # form — explicit decision values, as in the analysis recipe commands.
 WHAT_IF_PRESETS: dict[str, dict[str, str]] = {
-    "what-if-euclidean": {"metric": "euclidean", "threshold": "loo_alpha_01"},
-    "what-if-chisq": {"metric": "mahalanobis", "threshold": "chisq_shrinkage"},
+    "what-if-mahalanobis": {"metric": "mahalanobis"},
 }
 
 
 class FilterConfig(BaseModel):
-    """One point in the demo's decision space (a universe)."""
+    """One point in the demo's decision space (a universe or replay)."""
 
     model_config = ConfigDict(frozen=True)
-    metric: Literal["mahalanobis", "euclidean"]
-    threshold: Literal["loo_alpha_01", "chisq_shrinkage"]
+    metric: Literal["euclidean", "mahalanobis"]
     alpha: float = 0.01
-    shrinkage_beta: float = 0.75
 
 
 class ReferenceStats(BaseModel):
@@ -106,7 +101,7 @@ def get_reference_stats(npz_path: Path) -> ReferenceStats:
 def get_keep_mask(
     coords: np.ndarray, stats: ReferenceStats, config: FilterConfig
 ) -> np.ndarray:
-    """Apply one universe's filter to the slice; True = sentence retained.
+    """Apply one configuration's filter to the slice; True = sentence retained.
 
     Pooled location correction: distances are measured from the pooled OOS
     centroid of the slice (complete per cluster, so identical to the study's
@@ -114,26 +109,17 @@ def get_keep_mask(
     """
     mu_oos = coords.mean(axis=0)
     diff = coords - mu_oos
-    if config.threshold == "loo_alpha_01":
-        if config.metric == "mahalanobis":
-            d2 = np.einsum("ij,jk,ik->i", diff, np.linalg.inv(stats.cov_ref), diff)
-            cutoff = float(np.quantile(stats.loo_mahal_d2, 1.0 - config.alpha))
-            return d2 <= cutoff
+    if config.metric == "euclidean":
         d = np.linalg.norm(diff, axis=1)
         cutoff = float(np.quantile(stats.loo_eucl_d, 1.0 - config.alpha))
         return d <= cutoff
-    # chisq_shrinkage (defined for mahalanobis only; astra.yaml encodes this
-    # with a `requires: [distance_metric.mahalanobis]` constraint)
-    if config.metric != "mahalanobis":
-        raise ValueError("chisq_shrinkage is only defined for the mahalanobis metric")
-    cov_oos = np.cov(coords, rowvar=False) + RIDGE_EPS * np.eye(coords.shape[1])
-    cov_eff = config.shrinkage_beta * stats.cov_ref + (1.0 - config.shrinkage_beta) * cov_oos
-    d2 = np.einsum("ij,jk,ik->i", diff, np.linalg.inv(cov_eff), diff)
-    return d2 <= float(chi2.ppf(1.0 - config.alpha, df=coords.shape[1]))
+    d2 = np.einsum("ij,jk,ik->i", diff, np.linalg.inv(stats.cov_ref), diff)
+    cutoff = float(np.quantile(stats.loo_mahal_d2, 1.0 - config.alpha))
+    return d2 <= cutoff
 
 
 def get_retention(csv_path: Path, npz_path: Path, config: FilterConfig) -> RetentionResult:
-    """Run one universe end-to-end on the committed files."""
+    """Run one configuration end-to-end on the committed files."""
     df = load_subset(csv_path)
     stats = get_reference_stats(npz_path)
     mask = get_keep_mask(df[DIM_COLS].to_numpy(dtype=np.float64), stats, config)
@@ -155,18 +141,12 @@ def get_universe_config(universes_dir: Path, universe_id: str) -> FilterConfig:
     if not isinstance(decisions, dict):
         raise ValueError(f"{path.name}: no decisions mapping")
 
-    def get_option(decision_id: str) -> str:
-        sel = decisions.get(decision_id)
-        if isinstance(sel, dict):
-            sel = sel.get("option_id")
-        if not isinstance(sel, str):
-            raise ValueError(f"{path.name}: cannot read option for decision {decision_id!r}")
-        return sel
-
-    return FilterConfig(
-        metric=METRIC_OPTIONS[get_option("distance_metric")],  # type: ignore[arg-type]
-        threshold=THRESHOLD_OPTIONS[get_option("threshold_rule")],  # type: ignore[arg-type]
-    )
+    sel = decisions.get("distance_metric")
+    if isinstance(sel, dict):
+        sel = sel.get("option_id")
+    if not isinstance(sel, str):
+        raise ValueError(f"{path.name}: cannot read option for decision 'distance_metric'")
+    return FilterConfig(metric=METRIC_OPTIONS[sel])  # type: ignore[arg-type]
 
 
 def get_config(universes_dir: Path, name: str) -> FilterConfig:
@@ -190,11 +170,10 @@ def main() -> None:
         "counterfactual preset (diagnostic replay of an excluded option)",
     )
     parser.add_argument("--metric", default=None, choices=sorted(METRIC_OPTIONS))
-    parser.add_argument("--threshold", default=None, choices=sorted(THRESHOLD_OPTIONS))
     parser.add_argument(
         "--show-diff",
         action="store_true",
-        help="list sentences this universe retains that baseline removes",
+        help="list sentences the baseline retains that this replay removes",
     )
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
@@ -202,21 +181,19 @@ def main() -> None:
     npz_path = root / "data" / "reference_stats.npz"
     universes = root / "analysis" / "universes"
 
-    # Two entry forms: --universe <id> (reads the ASTRA universe file), or the
-    # ASTRA recipe form --metric X --threshold Y (both flags required together).
-    if (args.metric is None) != (args.threshold is None):
-        parser.error("--metric and --threshold must be given together")
+    # Two entry forms: --universe <id> (reads the ASTRA universe file or a
+    # preset), or the ASTRA recipe form --metric X.
     if args.metric is not None:
         if args.universe is not None:
-            parser.error("give either --universe or --metric/--threshold, not both")
+            parser.error("give either --universe or --metric, not both")
         label = "(from decision flags)"
-        config = FilterConfig(metric=args.metric, threshold=args.threshold)
+        config = FilterConfig(metric=args.metric)
     else:
         label = args.universe or "baseline"
         config = get_config(universes, label)
     result = get_retention(csv_path, npz_path, config)
     stats = get_reference_stats(npz_path)
-    print(f"universe: {label}   (metric={config.metric}, threshold={config.threshold})")
+    print(f"universe: {label}   (metric={config.metric}, alpha={config.alpha})")
     print(
         f"cluster {stats.cluster_1idx} (Forest Bioenergy): "
         f"retained {result.kept}/{result.n} ({result.pct}%)"
@@ -226,10 +203,13 @@ def main() -> None:
         df = load_subset(csv_path)
         coords = df[DIM_COLS].to_numpy(dtype=np.float64)
         here = get_keep_mask(coords, stats, config)
-        base = get_keep_mask(coords, stats, get_universe_config(universes, "baseline"))
-        extra = df[here & ~base]
-        print(f"\nretained here but removed by baseline: {len(extra)} sentences; first 5:")
-        for _, row in extra.head(5).iterrows():
+        base = get_keep_mask(coords, stats, get_config(universes, "baseline"))
+        dropped = df[base & ~here]
+        print(
+            f"\nretained by the accepted baseline but REMOVED here: "
+            f"{len(dropped)} sentences; first 5:"
+        )
+        for _, row in dropped.head(5).iterrows():
             print(f"  [{row.sentence_id}] {row.text_sentence[:80]}")
 
 

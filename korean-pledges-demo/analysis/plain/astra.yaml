@@ -1,18 +1,17 @@
-# ASTRA Analysis Specification — Korean pledges actor-attribution demo
+# ASTRA Analysis Specification — Korean pledges demo, PLAIN twin
 #
-# A simplified, runnable slice of a real study: filtering out-of-sample
-# Korean forest-policy pledge sentences against a reference corpus. Every
-# number quoted below is recomputed live by src/filter_pledges.py from the
-# committed data (tests/test_demo_numbers.py enforces this).
+# Identical to ../astra.yaml minus the RFC-0003 actor layer: the decision
+# space, the exclusion, and the technical reasons are all here, but nothing
+# says WHO proposed or excluded anything, or when. The live demo asks an
+# assistant to add the actor layer to a copy of this file, encoding the
+# facts in RECORDED_FACTS.md; the attributed ../astra.yaml is the
+# reference output.
 #
 # The decision this file records is a reversal: the shape-aware Mahalanobis
 # metric was the assumed-best choice on theoretical grounds, and was
 # excluded after inspection — its retention was implausibly low and the
 # quality of the retained set favored the simpler Euclidean filter, which
-# the final manuscript adopted. Provenance: internal TRACE record on file,
-# session trace_20260509_305aaf (the assumed-Mahalanobis state), and the
-# manuscript revision round of 2026-06-11 that directed and verified the
-# switch; source records are not published with this artifact.
+# the final manuscript adopted.
 #
 # Constants this demo holds fixed (see README): the threshold rule
 # (99th-percentile reference leave-one-out quantile, alpha = 0.01) and the
@@ -32,18 +31,6 @@ tags:
   - actor-attribution
   - real-data
   - example
-
-# Who was on this analysis's decisions (RFC-0003 actor layer).
-actors:
-  oliver:
-    type: human
-  claude_code:
-    type: agent
-    # Model id supplied by the researcher; the original working sessions
-    # predate model-id capture in the provenance record.
-    model: claude-opus-4-8
-    harness: claude-code
-    version: "2026-05"
 
 inputs:
   - id: pledges_subset
@@ -107,16 +94,6 @@ decisions:
           Shape-aware distance using the reference cluster's ridged
           covariance; retains 68/218 (31.2%) on the same sentences.
         excluded: true
-        # exclusion_rationale is the attributed one-line judgment; excluded_reason
-        # below is the fuller technical record. Both are part of the schema.
-        proposed_by: {actor: claude_code, role: methodology}
-        excluded_by: {actor: oliver, role: validation}
-        excluded_at: "2026-06-11"
-        exclusion_rationale: >-
-          The assumed-best option, excluded after inspection: theoretically
-          superior shape adaptation, but retention was implausibly low and
-          reviewing the retained sentences showed the simple metric was
-          producing the better set. Theory needed a human override.
         excluded_reason: >-
           Retains 68/218 (31.2%) vs 161/218 (73.9%) for Euclidean on this
           cluster — less than half the plausible rate, part of a
