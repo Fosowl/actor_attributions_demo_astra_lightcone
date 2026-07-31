@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build `korean-pledges-demo/`, a runnable real-data example showing what the RFC-0003 actor layer adds: a complete cluster slice of the Korean forest-policy OOS pledge corpus, a filter that recomputes the study's real retention numbers live, an attributed two-decision ASTRA analysis, and a live-demo chat script.
+**Goal:** Build `korean-pledges-demo/`, a runnable real-data example showing what the RFC-0004 actor layer adds: a complete cluster slice of the Korean forest-policy OOS pledge corpus, a filter that recomputes the study's real retention numbers live, an attributed two-decision ASTRA analysis, and a live-demo chat script.
 
 **Architecture:** A one-time extraction tool produces two committed data files (real sentences + derived reference statistics). A pure-function filter module recomputes retention per universe, reading its configuration *from the ASTRA universe files themselves*. The attributed `analysis/astra.yaml` quotes only numbers the pipeline computes; a test enforces that invariant permanently.
 
@@ -637,7 +637,7 @@ description: |
   retention than the accepted configuration, so every exclusion was a
   decision to keep the less tempting number.
 
-# Who was on this analysis's decisions (RFC-0003 actor layer).
+# Who was on this analysis's decisions (RFC-0004 actor layer).
 actors:
   oliver:
     type: human
@@ -1122,7 +1122,7 @@ record of WHO ruled anything out.
 
 **4 — Attribute it**
 
-> Add the RFC-0003 actor layer: register actors oliver (human) and
+> Add the RFC-0004 actor layer: register actors oliver (human) and
 > claude_code (agent, model claude-opus-4-8, harness claude-code). The
 > assistant proposed euclidean and chisq_shrinkage during the original
 > analysis; the researcher excluded both on 2026-05-09. Attribute each
@@ -1177,7 +1177,7 @@ Adds `korean-pledges-demo/`: a runnable real-data companion to the iris
 example. A complete 218-sentence slice of a real Korean forest-policy
 filtering study, a filter that recomputes the study's retention numbers
 live from the committed data, an attributed two-decision ASTRA analysis
-(RFC-0003 actor layer), and a live-demo chat script.
+(RFC-0004 actor layer), and a live-demo chat script.
 
 ## Why
 

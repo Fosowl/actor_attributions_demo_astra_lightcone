@@ -54,7 +54,7 @@ record of WHO ruled anything out.
 
 **5 — Attribute it**
 
-> Add the RFC-0003 actor layer: register actors oliver (human) and
+> Add the RFC-0004 actor layer: register actors oliver (human) and
 > claude_code (agent, model claude-opus-4-8, harness claude-code). The
 > assistant proposed euclidean and chisq_shrinkage during the original
 > analysis; the researcher excluded both on 2026-05-09. Attribute each

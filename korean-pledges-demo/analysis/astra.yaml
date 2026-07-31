@@ -26,7 +26,7 @@ tags:
   - real-data
   - example
 
-# Who was on this analysis's decisions (RFC-0003 actor layer).
+# Who was on this analysis's decisions (RFC-0004 actor layer).
 actors:
   oliver:
     type: human

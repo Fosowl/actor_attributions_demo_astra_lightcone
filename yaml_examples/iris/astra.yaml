@@ -13,7 +13,7 @@ tags:
   - sklearn
   - example
 
-# Optional actor layer (RFC-0003): who proposed and who ruled on options.
+# Optional actor layer (RFC-0004): who proposed and who ruled on options.
 actors:
   jane:
     type: human

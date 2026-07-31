@@ -1,5 +1,5 @@
 ---
-rfc: 0003
+rfc: 0004
 title: Optional actor attribution for decisions and universe selections
 status: Draft # Draft | Active | Accepted | Rejected | Superseded
 authors:
@@ -149,7 +149,7 @@ under *Questions or objections* below), and the two lists above are **not** two 
 they are views on one per-role allow-table, because a slot's legal range cannot depend
 on another object's `type`. The enum lives in the schema; the table is enforced by
 `astra-tools`. A reference implementation of both lives at
-`rfcs/0003-actor-attribution/reference/`.
+`rfcs/0004-actor-attribution/reference/`.
 
 **Corrections use existing fields, not a new structure.** A mistake that was
 caught and replaced is recorded the way ASTRA already records a discarded
@@ -313,7 +313,7 @@ proposed_by: {actor: assistant, role: executor}            # OK — executor is 
   - A **reference implementation** of the role vocabulary — a closed `Role` enum, a
     single `ROLE_ALLOWED_TYPES` table as the one source of truth (both per-type lists
     and every exclusion are *derived* from it), and four consistency guardrails as
-    tests — lives at `rfcs/0003-actor-attribution/reference/`. It is the normative
+    tests — lives at `rfcs/0004-actor-attribution/reference/`. It is the normative
     shape for the astra-tools side: deriving the two per-type lists from one table,
     rather than hand-maintaining them, is what stops them from drifting apart.
 - **Generated datamodels**: regenerate from the schema; all new slots optional.
@@ -586,7 +586,7 @@ fixed by the compatibility argument, not chosen by taste.
   actor-type's list. A self-contained reference implementation — closed `Role` enum,
   a single `ROLE_ALLOWED_TYPES` table from which both per-type lists and all
   exclusions are derived, and four consistency guardrails as tests — lives at
-  `rfcs/0003-actor-attribution/reference/`.)*
+  `rfcs/0004-actor-attribution/reference/`.)*
 - **`ResearcherId`: named slots or a scheme/value list?** Named slots (`orcid`,
   `arxiv`, `openalex`, `wikidata`, `google_scholar`) are self-documenting and let each id carry its own
   validation `pattern`, but adding a new scheme means a schema edit. A generic

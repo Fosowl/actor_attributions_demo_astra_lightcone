@@ -23,7 +23,7 @@ Status: approved design; amended during implementation (see Amendments).
 ## Purpose
 
 A second worked example for this repo, beside the iris toy: a real study,
-real data, and a real failure mode that the RFC-0003 actor layer addresses.
+real data, and a real failure mode that the RFC-0004 actor layer addresses.
 Target format is a live 3–5 minute demo for an audience unfamiliar with
 ASTRA, the actor layer, or the underlying study. Everything on screen is
 computed live from data committed in this repo.
@@ -31,7 +31,7 @@ computed live from data committed in this repo.
 ## Background the demo must carry
 
 - ASTRA encodes an analysis's decision space: the options considered, the
-  ones excluded, and why. The actor layer (RFC-0003, implemented in the two
+  ones excluded, and why. The actor layer (RFC-0004, implemented in the two
   submodules here) adds *who* proposed and excluded each option, and when.
 - The study: filtering out-of-sample Korean district-level election pledge
   sentences against an 18-dimensional reference embedding derived from a

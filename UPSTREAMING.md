@@ -1,4 +1,4 @@
-# Upstreaming the actor attribution layer (RFC-0003)
+# Upstreaming the actor attribution layer (RFC-0004)
 
 Status notes for turning the fork prototype in this repo into upstream
 pull requests against `LightconeResearch/astra-spec` and
@@ -9,7 +9,7 @@ this file records what is fork-only wiring versus what goes upstream.
 ## What the prototype contains
 
 - **astra-spec** (tagged `v0.0.13` on the fork):
-  - `rfcs/0003-actor-attribution.md` — the RFC draft.
+  - `rfcs/0004-actor-attribution.md` — the RFC draft.
   - `src/astra/schema/actor.yaml` — new LinkML module: `ActorType`,
     `HumanRole` / `AgentRole` enums, `ResearcherId`, `Actor`,
     `Attribution`; imported by `analysis.yaml` (`Analysis.actors`,
@@ -34,7 +34,7 @@ astra-spec's own RFC process expects the **draft PR to be the RFC
 document alone**, with implementation following acceptance in one
 reviewed PR per repo. So:
 
-1. **Now — upstream draft PR**: only `rfcs/0003-actor-attribution.md`,
+1. **Now — upstream draft PR**: only `rfcs/0004-actor-attribution.md`,
    opened as a GitHub draft against `LightconeResearch/astra-spec`,
    linking the fork branches as the reference implementation.
    Before opening: fill the `authors:` frontmatter, open the tracking
@@ -102,13 +102,13 @@ than shipping it inside the actor PR.
 
 ## Checklist for the upstream-clean implementation branches
 
-astra-spec (`rfc-0003-impl`):
+astra-spec (`RFC-0004-impl`):
 - [ ] Drop the fork-local `Release v0.0.13` commit and `v0.0.13` tag
       (upstream cuts its own release; version numbers are theirs).
 - [ ] Keep: `actor.yaml`, `analysis.yaml` / `universe.yaml` edits,
       regenerated datamodels, fixtures, `docs/specification.md`.
 
-astra-tools (`rfc-0003-impl`):
+astra-tools (`RFC-0004-impl`):
 - [ ] Remove `[tool.uv.sources]` from `pyproject.toml`.
 - [ ] Remove `uv.lock`; add it to `.gitignore`.
 - [ ] Cherry-pick the `astra init` version clamp into its own commit

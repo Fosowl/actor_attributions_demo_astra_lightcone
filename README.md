@@ -11,7 +11,7 @@ and rejected is indistinguishable from a default nobody looked at. That
 distinction is exactly what accountability, credit, and oversight of
 AI-assisted science need.
 
-This repo demonstrates **RFC-0003**: a small, optional, fully additive
+This repo demonstrates **RFC-0004**: a small, optional, fully additive
 **actor layer** — a registry of the humans and agents on an analysis, plus
 attribution fields on the two places a "who" is meaningful: the *options* of
 a decision and the *selections* of a universe.
@@ -69,7 +69,7 @@ CRediT-derived vocabulary keyed to the actor's type (`conceptualization` and
 
 | Path | What it is |
 |---|---|
-| [`astra-spec/`](https://github.com/Fosowl/astra-spec) | Fork submodule — the schema: `actor.yaml` LinkML module, RFC-0003 draft (`rfcs/0003-actor-attribution.md`) |
+| [`astra-spec/`](https://github.com/Fosowl/astra-spec) | Fork submodule — the schema: `actor.yaml` LinkML module, RFC-0004 draft (`rfcs/0004-actor-attribution.md`) |
 | [`astra-tools/`](https://github.com/Fosowl/astra-tools) | Fork submodule — the tooling: semantic enforcement, CLI display, attributed `examples/iris` |
 | [`install_and_validate.sh`](install_and_validate.sh) | One-shot local install + validation |
 | [`UPSTREAMING.md`](UPSTREAMING.md) | What goes upstream vs. fork-only wiring, PR strategy |

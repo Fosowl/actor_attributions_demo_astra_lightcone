@@ -74,7 +74,7 @@ echo "==> $(astra_run --version) | astra-spec $(env -u PYTHONPATH "$VENV/bin/pyt
 
 # Smoke check: the actor layer is present iff the schema serves the concept.
 if astra_run spec actor >/dev/null 2>&1; then
-  echo "==> Actor layer (RFC-0003) present: astra spec actor OK"
+  echo "==> Actor layer (RFC-0004) present: astra spec actor OK"
 else
   echo "==> NOTE: this astra-spec checkout has no Actor concept —"
   echo "    update the submodules (git submodule update --remote) for the actor layer."
