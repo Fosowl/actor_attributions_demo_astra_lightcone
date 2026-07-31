@@ -24,6 +24,9 @@ semantic validator, which is the actor layer's runtime enforcement point).
   prompts).
 - `install_and_validate.sh` — builds the shared venv at `.venv/` and
   validates an analysis plus its sibling universes.
+- `bootstrap.sh` — optional one-command setup (submodules, uv, venv,
+  validation, demo dependencies); `.devcontainer/` gives Codespaces and
+  VS Code containers the same setup via `bootstrap.sh --yes`.
 
 ## Commands (always via the repo venv; never a global astra)
 

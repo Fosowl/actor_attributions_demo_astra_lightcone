@@ -18,6 +18,16 @@ a decision and the *selections* of a universe.
 
 ## Try it
 
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/Fosowl/actor_attributions_demo_astra_lightcone?quickstart=1)
+
+In the browser: the badge opens a Codespace that builds the whole
+environment (submodules, venv, validation, Claude Code preinstalled — you
+sign in to Claude with your own account). When the terminal shows the
+setup finished, `cd live-demo && ./reset.sh` and follow
+[`docs/live-demo-walkthrough.md`](docs/live-demo-walkthrough.md).
+
+Locally:
+
 ```bash
 git clone --recurse-submodules https://github.com/Fosowl/actor_attributions_demo_astra_lightcone
 cd actor_attributions_demo_astra_lightcone

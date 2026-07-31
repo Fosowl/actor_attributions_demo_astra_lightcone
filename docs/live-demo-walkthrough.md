@@ -20,7 +20,20 @@ ruled out. The actor layer records *who* ruled it out, and when.
 - No API keys, no network access beyond the initial install, no data of
   your own — the sentences are committed here.
 
-## Setup, once
+## No local setup at all: Codespaces
+
+The repo's README carries an "Open in GitHub Codespaces" badge. That
+builds everything in the browser — submodules, environment, validation,
+Claude Code preinstalled — with nothing on your machine. Two things to
+know:
+
+- Sign in once: run `claude` in the codespace terminal and follow the
+  login URL it prints (your own Claude account; the container cannot ship
+  one).
+- Then continue at "Run it" below, starting from
+  `cd live-demo && ./reset.sh`.
+
+## Setup, once (local)
 
 ```bash
 git clone https://github.com/Fosowl/actor_attributions_demo_astra_lightcone

@@ -52,6 +52,14 @@ echo "==> Installing astra-spec + astra-tools into $VENV"
 PYTHON_VERSION="3.12"
 if [ ! -d "$VENV" ]; then
   uv venv --quiet -p "$PYTHON_VERSION" "$VENV"
+elif ! "$VENV/bin/python" -c 'import sys' 2>/dev/null; then
+  # The venv exists but its interpreter does not run at all — typically a
+  # venv built on another platform, e.g. a macOS .venv seen from inside a
+  # Linux container. It is a disposable build artifact this script owns,
+  # so recreate it rather than failing on it.
+  echo "==> Existing venv is not runnable on this platform; recreating it"
+  rm -rf "$VENV"
+  uv venv --quiet -p "$PYTHON_VERSION" "$VENV"
 elif ! "$VENV/bin/python" -c 'import sys; sys.exit(0 if sys.version_info >= (3, 11) else 1)' 2>/dev/null; then
   fail "the existing venv at $VENV runs a Python older than 3.11, which astra-tools requires. Remove it and re-run: rm -rf \"$VENV\""
 fi
