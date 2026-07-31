@@ -5,6 +5,8 @@ with the real failure mode the actor layer exists for: **the
 theoretically better method lost to the evidence, and a human had to make
 that call.**
 
+![The distance_metric decision, attributed](../assets/korean_pledges_decision.svg)
+
 ## The 90-second story
 
 A dissertation pipeline filters Korean presidential/district election
@@ -13,16 +15,15 @@ topic cluster. This demo ships the complete slice for one cluster
 (Forest Bioenergy): 218 real sentences with their 18-d embedding
 coordinates.
 
-Theory said use **Mahalanobis** distance — it adapts to each topic
-cluster's shape, so on paper it is the better membership test, and it was
-the assumed choice. But its retention came out implausibly low: 50.9%
-corpus-wide, and on the study's Climate Adaptation cluster it kept 0 of 2
-sentences. With per-cluster covariances estimated from small reference
-samples in 18 dimensions, the "shape" it adapted to was substantially
-estimation noise. The simple **Euclidean** filter retained 68.8%
-corpus-wide (1,143/1,662), and close review of the retained sentences
-during manuscript revision confirmed its set was superior. The final
-manuscript adopted Euclidean.
+Theory said use **Mahalanobis** distance — it adapts to each topic's
+stretched shape, so on paper it is the better membership test, and it was
+the assumed choice. But it kept implausibly little: 50.9% across the full
+dataset, and 0 of 2 sentences on the study's Climate Adaptation topic.
+Each topic's shape is estimated from only a handful of reference
+sentences, so the shape it adapted to was largely noise. The simple
+**Euclidean** filter kept 68.8% (1,143/1,662), and close review of the
+retained sentences during manuscript revision confirmed its set was
+better. The final manuscript adopted Euclidean.
 
 On this demo's cluster the contrast is: Euclidean **161/218 (73.9%)**
 accepted, Mahalanobis **68/218 (31.2%)** excluded. A plain ASTRA file
@@ -30,6 +31,8 @@ records *that* Mahalanobis was excluded and why. The actor layer records
 *who* proposed the theoretically-better option, *who* overruled it after
 inspection, and *when* — the human judgment call that no metric could have
 made, preserved where a reviewer or future collaborator can find it.
+
+![The decision, animated](../assets/korean_pledges_flow.gif)
 
 ## Run it
 

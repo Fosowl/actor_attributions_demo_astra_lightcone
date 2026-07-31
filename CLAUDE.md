@@ -9,6 +9,12 @@ semantic validator, which is the actor layer's runtime enforcement point).
 
 - `astra-spec/`, `astra-tools/` — fork submodules with the actor layer.
 - `astra-tools/examples/iris/` — toy attributed example.
+- `live-demo/` — a working directory as it stands *before* a decision
+  record exists (data, filter script, working notes), used to author one
+  live. **It has its own `CLAUDE.md`, and it is self-contained: when
+  working there, do not read `korean-pledges-demo/` or the examples —
+  they hold the finished version of the same analysis and reading them
+  defeats the exercise.**
 - `korean-pledges-demo/` — real-data example: 218 Korean pledge sentences,
   a runnable filter (`run_demo.sh`), an attributed analysis
   (`analysis/astra.yaml`), a plain un-attributed twin
@@ -62,8 +68,8 @@ Rules enforced by the semantic validator (astra-tools):
 - Universe selections: scalar shorthand (`decision: option_id`) or object
   (`{option_id: ..., selected_by: ..., reviewed_by: ...}`).
 - A universe may NOT select an excluded option (EXCLUDED_OPTION_SELECTED).
-  Excluded branches are replayed diagnostically (e.g.
-  `run_demo.sh -u what-if-mahalanobis`), never as universes.
+  Excluded branches may be replayed diagnostically through explicit
+  decision values, never as universes.
 - Recipe command placeholders: only `{inputs}`, `{inputs.<id>}`,
   `{decisions.<id>}`, `{output}`.
 

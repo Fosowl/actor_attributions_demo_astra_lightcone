@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 520" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <!-- background -->
+  <rect x="0" y="0" width="960" height="520" fill="#ffffff"/>
+
+  <!-- ============ LEFT: actors registry card ============ -->
+  <rect x="30" y="120" width="252" height="222" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.25"/>
+  <text x="50" y="152" font-size="15" font-weight="700" fill="#1e293b">actors:</text>
+
+  <!-- oliver entry -->
+  <rect x="48" y="170" width="216" height="70" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <rect x="52" y="176" width="4" height="58" rx="2" fill="#4f46e5"/>
+  <text x="68" y="196" font-size="13" font-weight="700" fill="#1e293b">oliver</text>
+  <rect x="122" y="183" width="50" height="17" rx="8.5" fill="#eef2ff" stroke="#c7d2fe" stroke-width="0.75"/>
+  <text x="147" y="195" font-size="10" font-weight="600" fill="#4f46e5" text-anchor="middle">human</text>
+  <text x="68" y="222" font-size="11" fill="#64748b">the researcher</text>
+
+  <!-- claude_code entry -->
+  <rect x="48" y="254" width="216" height="70" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <rect x="52" y="260" width="4" height="58" rx="2" fill="#d97706"/>
+  <text x="68" y="280" font-size="13" font-weight="700" fill="#1e293b">claude_code</text>
+  <rect x="162" y="267" width="48" height="17" rx="8.5" fill="#fef3c7" stroke="#fde68a" stroke-width="0.75"/>
+  <text x="186" y="279" font-size="10" font-weight="600" fill="#b45309" text-anchor="middle">agent</text>
+  <text x="68" y="306" font-size="11" fill="#64748b">claude-opus-4-8 / claude-code</text>
+
+  <!-- connectors (registry -> decision card) -->
+  <path d="M 266 205 C 308 205, 316 203, 354 203" fill="none" stroke="#94a3b8" stroke-width="1.3" opacity="0.75"/>
+  <circle cx="266" cy="205" r="2.4" fill="#94a3b8" opacity="0.9"/>
+  <circle cx="356" cy="203" r="2.4" fill="#94a3b8" opacity="0.9"/>
+  <path d="M 266 289 C 308 289, 316 281, 354 281" fill="none" stroke="#94a3b8" stroke-width="1.3" opacity="0.75"/>
+  <circle cx="266" cy="289" r="2.4" fill="#94a3b8" opacity="0.9"/>
+  <circle cx="356" cy="281" r="2.4" fill="#94a3b8" opacity="0.9"/>
+
+  <!-- ============ CENTER: decision card ============ -->
+  <rect x="332" y="76" width="312" height="326" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.25"/>
+  <text x="352" y="108" font-size="15" fill="#64748b">decision: <tspan font-weight="700" fill="#1e293b">distance_metric</tspan></text>
+
+  <!-- option: euclidean (accepted) -->
+  <rect x="348" y="126" width="280" height="88" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="362" y="148" font-size="12.5" font-weight="600" fill="#1e293b">euclidean</text>
+  <rect x="452" y="137" width="64" height="17" rx="8.5" fill="#dcfce7" stroke="#bbf7d0" stroke-width="0.75"/>
+  <text x="484" y="149" font-size="9.5" font-weight="700" fill="#15803d" text-anchor="middle">accepted</text>
+  <text x="362" y="169" font-size="10.5" fill="#64748b">the simple metric &#8212; adopted by the manuscript</text>
+  <rect x="362" y="180" width="204" height="20" rx="10" fill="#eef2ff" stroke="#c7d2fe" stroke-width="0.75"/>
+  <text x="464" y="193.5" font-size="10" fill="#4338ca" text-anchor="middle">selected by oliver (methodology)</text>
+
+  <!-- option: mahalanobis (excluded) -->
+  <rect x="348" y="228" width="280" height="150" rx="8" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="362" y="250" font-size="12.5" font-weight="600" fill="#94a3b8">mahalanobis</text>
+  <line x1="360" y1="246" x2="446" y2="246" stroke="#94a3b8" stroke-width="1.2"/>
+  <rect x="458" y="237" width="66" height="17" rx="8.5" fill="#fee2e2" stroke="#fecaca" stroke-width="0.75"/>
+  <text x="491" y="249" font-size="9.5" font-weight="700" fill="#dc2626" text-anchor="middle">excluded</text>
+  <text x="362" y="271" font-size="10.5" fill="#64748b">shape-aware &#8212; the option theory favored</text>
+  <rect x="362" y="282" width="218" height="20" rx="10" fill="#fef3c7" stroke="#fde68a" stroke-width="0.75"/>
+  <text x="471" y="295.5" font-size="10" fill="#b45309" text-anchor="middle">proposed by claude_code (methodology)</text>
+  <rect x="362" y="308" width="184" height="20" rx="10" fill="#eef2ff" stroke="#c7d2fe" stroke-width="0.75"/>
+  <text x="454" y="321.5" font-size="10" fill="#4338ca" text-anchor="middle">excluded by oliver (validation)</text>
+  <rect x="362" y="334" width="152" height="20" rx="10" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="0.75"/>
+  <text x="438" y="347.5" font-size="10" fill="#64748b" text-anchor="middle">excluded_at: 2026-06-11</text>
+
+  <!-- ============ RIGHT: retention evidence card ============ -->
+  <rect x="696" y="120" width="240" height="222" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.25"/>
+  <text x="716" y="152" font-size="13" font-weight="700" fill="#1e293b">the evidence</text>
+  <text x="716" y="170" font-size="10.5" fill="#64748b">sentences kept, of 218</text>
+
+  <!-- bar: euclidean 161/218 (73.9%) -->
+  <text x="716" y="198" font-size="11" font-weight="600" fill="#1e293b">euclidean</text>
+  <rect x="716" y="206" width="200" height="14" rx="4" fill="#eef2ff"/>
+  <rect x="716" y="206" width="148" height="14" rx="4" fill="#4f46e5"/>
+  <text x="716" y="238" font-size="10.5" fill="#334155">161/218&#160;&#160;(73.9%)</text>
+
+  <!-- bar: mahalanobis 68/218 (31.2%) -->
+  <text x="716" y="268" font-size="11" font-weight="600" fill="#64748b">mahalanobis</text>
+  <rect x="716" y="276" width="200" height="14" rx="4" fill="#f1f5f9"/>
+  <rect x="716" y="276" width="62" height="14" rx="4" fill="#64748b"/>
+  <text x="716" y="308" font-size="10.5" fill="#334155">68/218&#160;&#160;(31.2%)</text>
+  <rect x="790" y="296" width="88" height="16" rx="8" fill="#fee2e2" stroke="#fecaca" stroke-width="0.75"/>
+  <text x="834" y="307.5" font-size="9" font-weight="700" fill="#dc2626" text-anchor="middle">over-rejecting</text>
+
+  <!-- connector (decision -> evidence) -->
+  <path d="M 628 252 C 664 252, 668 231, 694 231" fill="none" stroke="#94a3b8" stroke-width="1.3" opacity="0.75"/>
+  <circle cx="628" cy="252" r="2.4" fill="#94a3b8" opacity="0.9"/>
+  <circle cx="694" cy="231" r="2.4" fill="#94a3b8" opacity="0.9"/>
+
+  <!-- ============ caption ============ -->
+  <text x="480" y="452" font-size="13" font-style="italic" fill="#64748b" text-anchor="middle">Theory proposed the shape-aware metric. The evidence overruled it &#8212; and the record says who ruled, and when.</text>
+</svg>
