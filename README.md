@@ -25,6 +25,8 @@ cd actor_attributions_demo_astra_lightcone
 ./install_and_validate.sh --suite    # additionally run the astra-tools test suite
 ```
 
+Or `./bootstrap.sh` to do the whole setup in one step, submodules included.
+
 ## The layer at a glance
 
 ```yaml

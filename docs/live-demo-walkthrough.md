@@ -23,11 +23,23 @@ ruled out. The actor layer records *who* ruled it out, and when.
 ## Setup, once
 
 ```bash
+git clone https://github.com/Fosowl/actor_attributions_demo_astra_lightcone
+cd actor_attributions_demo_astra_lightcone
+./bootstrap.sh
+```
+
+`bootstrap.sh` checks for `git` and `uv` (offering to install uv), fetches
+the submodules, builds the environment, validates the toy example, and runs
+the demo filter once to prove the workspace works. It creates and installs;
+it never deletes.
+
+Prefer the steps by hand? They still work:
+
+```bash
 git clone --recurse-submodules https://github.com/Fosowl/actor_attributions_demo_astra_lightcone
 cd actor_attributions_demo_astra_lightcone
 ./install_and_validate.sh        # builds .venv/, ends "All checks passed."
-cd live-demo
-./reset.sh                       # confirms the workspace is ready
+cd live-demo && ./reset.sh       # confirms the workspace is ready
 ```
 
 `live-demo/` is a researcher's working directory as it stands *before* any
