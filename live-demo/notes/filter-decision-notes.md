@@ -6,6 +6,7 @@ this is the raw material one would be written from.
 ## Who worked on this
 
 - **Oliver** — the researcher on the project. Human.
+  ORCID: `0000-0002-5967-1314`.
 - **The assistant** — Claude Opus, model id `claude-opus-4-8`, running in
   the Claude Code harness, working sessions dated May 2026. An agent.
 

@@ -93,6 +93,10 @@ def main() -> None:
             print(f"\nkept by euclidean, removed by mahalanobis: {len(gap)}; first 5:")
             for _, row in gap.head(5).iterrows():
                 print(f"  [{row.sentence_id}] {row.text_sentence[:70]}")
+            rev = df[masks["mahalanobis"] & ~masks["euclidean"]]
+            print(f"\nkept by mahalanobis, removed by euclidean: {len(rev)}; all of them:")
+            for _, row in rev.iterrows():
+                print(f"  [{row.sentence_id}] {row.text_sentence[:70]}")
         return
 
     if not args.metric:

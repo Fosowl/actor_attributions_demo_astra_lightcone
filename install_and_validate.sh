@@ -43,7 +43,26 @@ command -v uv >/dev/null 2>&1 \
 git -C "$SPEC" fetch --tags --quiet origin 2>/dev/null || true
 
 echo "==> Installing astra-spec + astra-tools into $VENV"
-[ -d "$VENV" ] || uv venv --quiet "$VENV"
+# Pin the interpreter. astra-tools requires >= 3.11, while an unpinned
+# `uv venv` inherits whatever python happens to be first on PATH; on a machine
+# defaulting to 3.9 or 3.10 that surfaces as an opaque dependency-resolution
+# failure rather than a version error. uv fetches a managed 3.12 when the
+# system has none. An existing venv is reused untouched, so this changes
+# nothing for an environment that already works.
+PYTHON_VERSION="3.12"
+if [ ! -d "$VENV" ]; then
+  uv venv --quiet -p "$PYTHON_VERSION" "$VENV"
+elif ! "$VENV/bin/python" -c 'import sys' 2>/dev/null; then
+  # The venv exists but its interpreter does not run at all — typically a
+  # venv built on another platform, e.g. a macOS .venv seen from inside a
+  # Linux container. It is a disposable build artifact this script owns,
+  # so recreate it rather than failing on it.
+  echo "==> Existing venv is not runnable on this platform; recreating it"
+  rm -rf "$VENV"
+  uv venv --quiet -p "$PYTHON_VERSION" "$VENV"
+elif ! "$VENV/bin/python" -c 'import sys; sys.exit(0 if sys.version_info >= (3, 11) else 1)' 2>/dev/null; then
+  fail "the existing venv at $VENV runs a Python older than 3.11, which astra-tools requires. Remove it and re-run: rm -rf \"$VENV\""
+fi
 # Installed as real packages, not editable. Editable installs write .pth files,
 # macOS flags them UF_HIDDEN, and CPython >= 3.11 skips hidden .pth files without
 # warning, which silently turns the install into a no-op after it has already

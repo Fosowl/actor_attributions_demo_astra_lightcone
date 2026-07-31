@@ -1,6 +1,6 @@
 # ASTRA Analysis Specification — Korean pledges demo, PLAIN twin
 #
-# Identical to ../astra.yaml minus the RFC-0003 actor layer: the decision
+# Identical to ../astra.yaml minus the RFC-0004 actor layer: the decision
 # space, the exclusion, and the technical reasons are all here, but nothing
 # says WHO proposed or excluded anything, or when. The live demo asks an
 # assistant to add the actor layer to a copy of this file, encoding the

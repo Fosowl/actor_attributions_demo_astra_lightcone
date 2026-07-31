@@ -1,6 +1,6 @@
 # CLAUDE.md — actor_attributions_demo_astra_lightcone
 
-Demo repository for the RFC-0003 **actor attribution** layer on ASTRA.
+Demo repository for the RFC-0004 **actor attribution** layer on ASTRA.
 The two submodules carry the working implementation: `astra-spec` (LinkML
 schema + generated datamodels) and `astra-tools` (the `astra` CLI and the
 semantic validator, which is the actor layer's runtime enforcement point).
@@ -24,6 +24,9 @@ semantic validator, which is the actor layer's runtime enforcement point).
   prompts).
 - `install_and_validate.sh` — builds the shared venv at `.venv/` and
   validates an analysis plus its sibling universes.
+- `bootstrap.sh` — optional one-command setup (submodules, uv, venv,
+  validation, demo dependencies); `.devcontainer/` gives Codespaces and
+  VS Code containers the same setup via `bootstrap.sh --yes`.
 
 ## Commands (always via the repo venv; never a global astra)
 
@@ -38,7 +41,7 @@ cd korean-pledges-demo && ./run_demo.sh [-u <run-name>] [--validate]
 Tests for the Korean demo (from `korean-pledges-demo/`):
 `env -u PYTHONPATH ../.venv/bin/python -m pytest tests/ -v`
 
-## Actor layer authoring reference (RFC-0003)
+## Actor layer authoring reference (RFC-0004)
 
 Registry — one `actors:` map at analysis level:
 
