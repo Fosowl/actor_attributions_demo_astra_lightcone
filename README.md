@@ -22,6 +22,15 @@ humans and agents on an analysis, plus attribution fields on the two places
 a "who" is meaningful: the *options* of a decision and the *selections* of
 a universe.
 
+## Guided tour (no setup)
+
+[`docs/demo-day-walkthrough.html`](docs/demo-day-walkthrough.html) is a
+self-contained interactive page that walks the whole story — the layer,
+the trap, the evidence plots, enforcement, and the payoff — with every
+number and error message a captured output of the committed pipeline.
+[Open it rendered](https://raw.githack.com/Fosowl/actor_attributions_demo_astra_lightcone/main/docs/demo-day-walkthrough.html),
+or open the file locally after cloning.
+
 ## The layer at a glance
 
 ![Actor attribution overview](assets/actor_attribution.svg)
