@@ -19,8 +19,15 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VENV="$HERE/../.venv"
 SCRATCH="/tmp/astra-demo"
 DRY=0
-[ "${1:-}" = "--dry-run" ] && DRY=1
-[ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ] && { sed -n '2,16p' "$0"; exit 0; }
+# Unknown arguments are rejected rather than ignored: a typo such as
+# --dryrun must not silently perform a real reset.
+for arg in "$@"; do
+  case "$arg" in
+    --dry-run) DRY=1 ;;
+    -h|--help) sed -n '2,16p' "$0"; exit 0 ;;
+    *) printf 'error: unknown argument %s (try --help)\n' "$arg" >&2; exit 2 ;;
+  esac
+done
 
 say() { printf '%s\n' "$*"; }
 
@@ -68,6 +75,16 @@ say "verifying..."
 [ -x "$VENV/bin/python" ] || {
   say "error: $VENV is missing — run ../install_and_validate.sh from the repo root first" >&2
   exit 1; }
+
+# install_and_validate.sh installs astra only; the filter also needs the
+# scientific stack. Idempotent, and near-instant once satisfied.
+if ! env -u PYTHONPATH "$VENV/bin/python" -c 'import numpy, pandas' 2>/dev/null; then
+  command -v uv >/dev/null 2>&1 || {
+    say "error: the filter needs numpy and pandas, and uv is not available to install them" >&2
+    exit 1; }
+  say "    installing the filter's dependencies (first time only)..."
+  uv pip install --quiet -p "$VENV" numpy pandas scipy pydantic pyyaml pytest
+fi
 out="$(env -u PYTHONPATH "$VENV/bin/python" "$HERE/src/filter.py" --compare)"
 printf '%s\n' "$out" | sed 's/^/    /'
 case "$out" in

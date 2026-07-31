@@ -91,3 +91,7 @@ enforcement working, not a limitation.
   trace_20260509_305aaf (the assumed-Mahalanobis state) and the manuscript
   revision round of 2026-06-11 that directed and verified the switch to
   Euclidean. Source records are not published with this artifact.
+- Researcher: [ORCID 0000-0002-5967-1314](https://orcid.org/0000-0002-5967-1314).
+  The projection method behind the 18-d coordinates is
+  [REAP](https://github.com/Thru-Echoes/REAP) — see that repo for the
+  method itself.

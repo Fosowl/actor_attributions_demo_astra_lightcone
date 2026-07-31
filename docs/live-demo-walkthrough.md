@@ -2,7 +2,7 @@
 
 A walkthrough anyone can run: six prompts to an agentic coding assistant
 that turn a real analysis-in-progress into a validated ASTRA file, then
-add the RFC-0003 actor layer on top.
+add the RFC-0004 actor layer on top.
 
 The point it makes: theory picked one method, the evidence picked another,
 and a person had to decide between them. Plain ASTRA records *what* was
@@ -10,6 +10,17 @@ ruled out. The actor layer records *who* ruled it out, and when.
 
 > **Do not open this file from inside a running session.** It contains the
 > answers. The workspace it describes deliberately does not.
+
+## What you're looking at
+
+The data is Korean forest-policy text: sentences from election pledges.
+Each sentence is turned into an embedding — a list of numbers that places
+it as a point in space, where sentences with similar meaning sit close
+together. Grouping nearby points gives topics; this demo's topic is
+Forest Bioenergy. The step you'll watch is the filter at the end:
+deciding, sentence by sentence, which ones truly represent the topic and
+which to drop. How to measure "represents the topic" is a real research
+decision — and recording who made that decision is what this demo is for.
 
 ## What you need
 
@@ -20,14 +31,39 @@ ruled out. The actor layer records *who* ruled it out, and when.
 - No API keys, no network access beyond the initial install, no data of
   your own — the sentences are committed here.
 
-## Setup, once
+## No local setup at all: Codespaces
+
+The repo's README carries an "Open in GitHub Codespaces" badge. That
+builds everything in the browser — submodules, environment, validation,
+Claude Code preinstalled — with nothing on your machine. Two things to
+know:
+
+- Sign in once: run `claude` in the codespace terminal and follow the
+  login URL it prints (your own Claude account; the container cannot ship
+  one).
+- Then continue at "Run it" below, starting from
+  `cd live-demo && ./reset.sh`.
+
+## Setup, once (local)
+
+```bash
+git clone https://github.com/Fosowl/actor_attributions_demo_astra_lightcone
+cd actor_attributions_demo_astra_lightcone
+./bootstrap.sh
+```
+
+`bootstrap.sh` checks for `git` and `uv` (offering to install uv), fetches
+the submodules, builds the environment, validates the toy example, and runs
+the demo filter once to prove the workspace works. It creates and installs;
+it never deletes.
+
+Prefer the steps by hand? They still work:
 
 ```bash
 git clone --recurse-submodules https://github.com/Fosowl/actor_attributions_demo_astra_lightcone
 cd actor_attributions_demo_astra_lightcone
 ./install_and_validate.sh        # builds .venv/, ends "All checks passed."
-cd live-demo
-./reset.sh                       # confirms the workspace is ready
+cd live-demo && ./reset.sh       # confirms the workspace is ready
 ```
 
 `live-demo/` is a researcher's working directory as it stands *before* any
@@ -80,7 +116,7 @@ from a default nobody looked at.
 
 **5 — Add the actor layer**
 
-> Read notes/filter-decision-notes.md and add the RFC-0003 actor layer to
+> Read notes/filter-decision-notes.md and add the RFC-0004 actor layer to
 > /tmp/astra-demo/filter.yaml: register everyone involved, and attribute
 > the exclusion — who proposed it, who ruled it out, when, and the
 > one-line reason. Validate again.
@@ -111,16 +147,3 @@ That deletes `/tmp/astra-demo/`, restores anything modified in the
 workspace, and re-runs the filter to prove it still works. Start a **fresh
 assistant session** as well — a session that already has the answers in
 its context will report them instead of working them out.
-
-## If the assistant reads ahead
-
-`korean-pledges-demo/` in this repo holds the finished version of this
-same analysis. The workspace's `CLAUDE.md` tells sessions not to read it.
-If one does anyway, say "work only from what's in this directory" and
-re-send the prompt.
-
-## The finished version
-
-For the completed record — the attributed analysis, the tests that pin
-every quoted number to a live computation, and the figures — see
-[`../korean-pledges-demo/`](../korean-pledges-demo/).

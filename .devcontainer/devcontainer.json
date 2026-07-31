@@ -1,0 +1,37 @@
+// Dev container for this repo — used by GitHub Codespaces and by
+// VS Code "Reopen in Container". Entirely optional: the manual setup
+// (./bootstrap.sh, or ./install_and_validate.sh by hand) is unchanged
+// and remains the reference path.
+{
+  "name": "ASTRA actor-attribution demo",
+  "image": "mcr.microsoft.com/devcontainers/python:3.12",
+
+  "features": {
+    // Node first: the claude-code feature's own fallback Node install is
+    // incomplete on Debian bases (no npm), so declare it explicitly.
+    "ghcr.io/devcontainers/features/node:1": {},
+    // Official Claude Code feature. The user still authenticates with
+    // their own account: run `claude` once and follow the login URL.
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}
+  },
+
+  // onCreate (not postCreate) so a future prebuild can capture the result.
+  // bootstrap.sh is idempotent: submodules, uv, the shared venv, the astra
+  // validation pass, and the demo's Python dependencies.
+  "onCreateCommand": "./bootstrap.sh --yes",
+
+  // uv installs itself into ~/.local/bin; make sure later terminals see it
+  // even if the base image's profile does not add it.
+  "remoteEnv": {
+    "PATH": "${containerEnv:PATH}:/home/vscode/.local/bin"
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": ["redhat.vscode-yaml"],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  }
+}
