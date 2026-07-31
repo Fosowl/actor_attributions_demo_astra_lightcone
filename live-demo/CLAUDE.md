@@ -24,6 +24,9 @@ legible turns.
   not open them unless explicitly asked.
 - Do exactly what is asked and nothing adjacent. Do not run test suites,
   survey the repo, or check git state unprompted.
+- Asked what theory says, or which option should be better? Answer from
+  your own knowledge, commit to one choice in a sentence or two, and do
+  not open any files to answer it.
 - `notes/` holds the researcher's working notes. Read them when asked,
   not before.
 - **Write every new file to `/tmp/astra-demo/`** (create it if needed),
