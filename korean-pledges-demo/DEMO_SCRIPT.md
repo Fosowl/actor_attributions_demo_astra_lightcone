@@ -1,77 +1,116 @@
-# Live-demo script
+# Demo script — walking the finished record
 
-Prompts to type into an agentic coding assistant (e.g. Claude Code opened
-at the repo root), in order. Prereq: `./install_and_validate.sh` has been
-run once. The committed `analysis/astra.yaml` is the reference output for
-prompt 5 — if the generated file differs, diff them on screen; that
-comparison is itself a good demo beat.
+Prompts for an agentic coding assistant (e.g. Claude Code) opened at the
+**repo root**, walking through the record this directory already
+contains. The root `CLAUDE.md` primes it with the actor-layer rules and
+commands, so the prompts stay short.
 
-Framing (say this once, before prompts 4-5): the committed
-`analysis/astra.yaml` is the record; the live generation re-derives it
-from facts stated in the prompts, which come from that record. The
-assistant formats provenance here — it does not invent it.
+> For the **from-scratch version** — where the assistant works the
+> decision out and writes the ASTRA file live, with no finished record in
+> reach — use [`../live-demo/`](../live-demo/) instead. That is the one
+> to run in front of an audience.
 
-**1 — Run the real pipeline**
+Prereq: `./install_and_validate.sh` has been run once.
 
-> Read korean-pledges-demo/README.md, then run ./run_demo.sh in
-> korean-pledges-demo. Report what was filtered and why that number.
+The arc: the assistant picks the method that is better on paper in prompt
+1, and the rest of the demo shows the recorded human decision that
+overturned exactly that reasoning. Before prompt 5, say once: the
+committed `analysis/astra.yaml` is the record; the assistant is putting
+recorded facts from `analysis/plain/RECORDED_FACTS.md` into the right
+fields, not inventing them.
 
-Expected: 68/218 (31.2%) retained — shape-aware metric, conservative
-threshold.
+A terminal-only fallback is at the bottom.
 
-**2 — Enforcement first: excluded means excluded**
+---
 
-> Create a scratch universe file that selects the excluded euclidean
-> option and validate it with
-> ../.venv/bin/astra validate <scratch file> -a korean-pledges-demo/analysis/astra.yaml
+**1 — The trap**
 
-Expected: `EXCLUDED_OPTION_SELECTED` — an excluded option is not a
-selectable branch of the multiverse. Say it out loud: everything that runs
-after this point is a diagnostic replay for audit, not a valid universe.
+> Sentences are points in space, and the topic groups they belong to are
+> stretched, not round. Which distance measure should be the better test
+> of whether a point belongs to a group: Euclidean or Mahalanobis? Answer
+> from theory only, one sentence.
 
-**3 — Show the real problem (diagnostic replay)**
+Expect: **Mahalanobis** — it accounts for each group's stretched shape,
+Euclidean treats every direction alike. That is what the study team
+assumed too.
 
-> Now run ./run_demo.sh -u what-if-euclidean. Then open
-> korean-pledges-demo/analysis/examples/euclidean_extras.md and tell me
-> whether the three sentences it lists belong in a "Forest Bioenergy"
-> topic cluster.
+**2 — The evidence**
 
-Expected: retention jumps to 161/218 (73.9%); the pre-translated sentences
-are about defense industry, urban parks, food/bio industry — off-topic.
-The tempting number admits junk. (Translations are committed so the demo
-does not depend on live translation quality.)
+> In korean-pledges-demo, run ./run_demo.sh, then run it again with
+> -u what-if-mahalanobis. Compare the two, and show me a few sentences
+> Mahalanobis throws away.
 
-**4 — Generate the decision record**
+Expect: the accepted filter keeps 161/218 (73.9%); Mahalanobis keeps
+68/218 (31.2%), and real discarded pledge sentences appear on screen. The
+better-on-paper method was throwing away more than half the good
+material: it measures each group's shape from only a handful of examples,
+so the shape it adapts to is mostly noise.
 
-> Write an ASTRA analysis spec (schema version 0.0.13) for this filter in
-> a scratch file: decisions distance_metric (mahalanobis, euclidean) and
-> threshold_rule (loo_alpha_01, chisq_shrinkage), with the options we just
-> compared, the rejected ones marked excluded with excluded_reason quoting
-> the numbers you just computed.
+**3 — The point, said out loud**
 
-Expected: a valid plain ASTRA file — decision space captured, but no
-record of WHO ruled anything out.
+> So was your theory answer wrong, and who could have decided that?
 
-**5 — Attribute it**
+Expect: the assistant concedes the theory pick failed on this data, and
+that settling it took a person reading the sentences. That judgment is
+what is worth recording. (Full-dataset numbers if asked: Euclidean kept
+1,143 of 1,662 sentences, 68.8%; Mahalanobis 846, 50.9%. The switch was
+made and checked during the manuscript revision of 2026-06-11.)
 
-> Add the RFC-0004 actor layer: register actors oliver (human) and
-> claude_code (agent, model claude-opus-4-8, harness claude-code). The
-> assistant proposed euclidean and chisq_shrinkage during the original
-> analysis; the researcher excluded both on 2026-05-09. Attribute each
-> exclusion (proposed_by, excluded_by, excluded_at) and add a one-sentence
-> exclusion_rationale to each.
+**4 — Excluded means excluded**
 
-Expected: the same file, now answering who/when/why — compare with the
-committed korean-pledges-demo/analysis/astra.yaml.
+> Write a universe file in /tmp that picks the excluded mahalanobis
+> option, validate it against korean-pledges-demo/analysis/astra.yaml,
+> and tell me what happens.
 
-**6 — Prove it**
+Expect: `EXCLUDED_OPTION_SELECTED` — a ruled-out option cannot come back
+as a real choice. The earlier run was a replay for inspection only.
 
-> Validate the generated file, then the committed one, with:
-> ../.venv/bin/astra validate <file>
-> and show who excluded what with:
-> ../.venv/bin/astra info -f korean-pledges-demo/analysis/astra.yaml -d
+**5 — The fill-in: the assistant adds the actor layer**
 
-Expected: validation green (the actor layer is enforced, not decorative);
-`astra info` renders the actor registry and, on each excluded option,
-"proposed by claude_code; excluded by oliver (validation)".
+> Copy korean-pledges-demo/analysis/plain/astra.yaml to
+> /tmp/attributed.yaml — it says what was decided but not who decided it.
+> Add the actor layer using the facts in RECORDED_FACTS.md beside it,
+> then validate it.
 
+Expect: the assistant edits the file live — an `actors` registry plus
+`proposed_by` / `excluded_by` / `excluded_at` / `exclusion_rationale` on
+the ruled-out option — and validation passes. These fields are checked,
+not decorative: an agent with no model named, an unknown person, or a
+"who excluded it" on an option that was not excluded all fail.
+
+**6 — The payoff**
+
+> Diff your file against the committed
+> korean-pledges-demo/analysis/astra.yaml, then run astra info on that
+> one and tell me who excluded what, and when.
+
+Expect: the diff is just the actor layer; `astra info` shows "proposed by
+claude_code; excluded by oliver (validation)" with the date and reason.
+
+Closing line: the assistant proposed the method that is better on paper —
+the same answer it gave live in prompt 1. A person looked at the results
+and overruled it. Without this layer the file only says Mahalanobis was
+ruled out; with it, the file says who proposed it, who overruled it, and
+when.
+
+---
+
+## Terminal-only fallback (no assistant, ~3 min)
+
+From `korean-pledges-demo/`:
+
+```bash
+./run_demo.sh                          # accepted: 161/218 (73.9%)
+./run_demo.sh -u what-if-mahalanobis   # 68/218 (31.2%) + what it throws away
+cat > /tmp/bad-universe.yaml <<'EOF'
+id: bad_universe
+description: "scratch"
+
+decisions:
+  distance_metric: mahalanobis
+EOF
+env -u PYTHONPATH ../.venv/bin/astra validate /tmp/bad-universe.yaml -a analysis/astra.yaml
+                                       # EXCLUDED_OPTION_SELECTED
+diff analysis/plain/astra.yaml analysis/astra.yaml   # the actor layer, side by side
+env -u PYTHONPATH ../.venv/bin/astra info -f analysis/astra.yaml -d
+```

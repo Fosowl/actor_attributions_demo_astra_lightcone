@@ -55,6 +55,18 @@ CRediT-derived vocabulary keyed to the actor's type (`conceptualization` and
 
 ![Attribution flow](assets/attribution_flow.gif)
 
+## A real-data example
+
+[`korean-pledges-demo/`](korean-pledges-demo/) applies the layer to a real
+study: 218 committed Korean forest-policy pledge sentences and the filter
+decision where the theoretically better metric lost to the evidence — the
+agent proposed shape-aware Mahalanobis, the numbers and a close reading of
+the retained sentences favored simple Euclidean, and a human overruled the
+theory. The record preserves who proposed, who ruled, and when; a runnable
+pipeline recomputes every quoted number from the committed data.
+
+![Korean pledges decision, attributed](assets/korean_pledges_decision.svg)
+
 ## What validation now catches
 
 ```
@@ -71,6 +83,7 @@ CRediT-derived vocabulary keyed to the actor's type (`conceptualization` and
 |---|---|
 | [`astra-spec/`](https://github.com/Fosowl/astra-spec) | Fork submodule — the schema: `actor.yaml` LinkML module, RFC-0004 draft (`rfcs/0004-actor-attribution.md`) |
 | [`astra-tools/`](https://github.com/Fosowl/astra-tools) | Fork submodule — the tooling: semantic enforcement, CLI display, attributed `examples/iris` |
+| [`live-demo/`](live-demo/) | A working directory *before* any decision record exists — data, filter script, working notes — for authoring an attributed analysis from scratch. Walkthrough: [`docs/live-demo-walkthrough.md`](docs/live-demo-walkthrough.md) |
 | [`install_and_validate.sh`](install_and_validate.sh) | One-shot local install + validation |
 | [`UPSTREAMING.md`](UPSTREAMING.md) | What goes upstream vs. fork-only wiring, PR strategy |
 
