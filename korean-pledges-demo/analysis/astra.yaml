@@ -37,6 +37,7 @@ tags:
 actors:
   oliver:
     type: human
+    identifiers: {orcid: "0000-0002-5967-1314"}
   claude_code:
     type: agent
     # Model id supplied by the researcher; the original working sessions

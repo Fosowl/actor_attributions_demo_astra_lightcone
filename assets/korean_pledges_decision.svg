@@ -12,7 +12,7 @@
   <text x="68" y="196" font-size="13" font-weight="700" fill="#1e293b">oliver</text>
   <rect x="122" y="183" width="50" height="17" rx="8.5" fill="#eef2ff" stroke="#c7d2fe" stroke-width="0.75"/>
   <text x="147" y="195" font-size="10" font-weight="600" fill="#4f46e5" text-anchor="middle">human</text>
-  <text x="68" y="222" font-size="11" fill="#64748b">the researcher</text>
+  <text x="68" y="222" font-size="11" fill="#64748b">orcid: 0000-0002-5967-1314</text>
 
   <!-- claude_code entry -->
   <rect x="48" y="254" width="216" height="70" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>

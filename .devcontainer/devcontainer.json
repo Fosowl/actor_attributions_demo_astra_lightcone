@@ -7,9 +7,11 @@
   "image": "mcr.microsoft.com/devcontainers/python:3.12",
 
   "features": {
-    // Official Claude Code feature; installs Node itself if needed.
-    // The user still authenticates with their own account: run `claude`
-    // once and follow the login URL it prints.
+    // Node first: the claude-code feature's own fallback Node install is
+    // incomplete on Debian bases (no npm), so declare it explicitly.
+    "ghcr.io/devcontainers/features/node:1": {},
+    // Official Claude Code feature. The user still authenticates with
+    // their own account: run `claude` once and follow the login URL.
     "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}
   },
 

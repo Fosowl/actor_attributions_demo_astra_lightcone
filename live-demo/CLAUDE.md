@@ -10,13 +10,11 @@ legible turns.
 
 ## Response style
 
-- **Two or three sentences per turn.** Longer only when asked to explain.
+- **Two or three sentences per turn.** 
 - **No preamble, no recap, no next-steps.** Answer, then stop.
 - Let command output and file contents speak; quote only the number or
   error that matters.
-- Plain words. The audience does not share terms like anisotropic,
-  covariance, or quantile — say "stretched shape", "each topic's spread",
-  "cut-off".
+- Plain words when possible.
 - Prose over bullet lists unless the answer is genuinely a list.
 
 ## Scope
@@ -98,7 +96,7 @@ Recipe commands accept only `{inputs}`, `{inputs.<id>}`,
 
 ## The actor layer (RFC-0003)
 
-Optional, additive. A registry of who was involved, plus attribution on
+**BE SURE TO INCLUDE THIS IN ASTRA SPEC:** A registry of who was involved, plus attribution on
 the options of a decision:
 
 ```yaml

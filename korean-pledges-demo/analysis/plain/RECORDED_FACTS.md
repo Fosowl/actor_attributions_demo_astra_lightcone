@@ -11,7 +11,7 @@ Encode these facts, exactly, when adding the RFC-0003 actor layer to a
 copy of `plain/astra.yaml`:
 
 - Actors:
-  - `oliver` — human (the researcher).
+  - `oliver` — human (the researcher); ORCID `0000-0002-5967-1314`.
   - `claude_code` — agent; model `claude-opus-4-8`; harness `claude-code`;
     version `"2026-05"`.
 - `distance_metric.mahalanobis` (already excluded): proposed by
