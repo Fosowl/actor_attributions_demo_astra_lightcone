@@ -1,6 +1,6 @@
 # Authoring an attributed analysis, live
 
-A walkthrough anyone can run: six prompts to an agentic coding assistant
+A walkthrough anyone can run: seven prompts to an agentic coding assistant
 that turn a real analysis-in-progress into a validated ASTRA file, then
 add the RFC-0004 actor layer on top.
 
@@ -77,13 +77,14 @@ Open your assistant **inside `live-demo/`**, then paste these in order.
 **1 — What does theory say?**
 
 > I'm filtering sentences into topic groups. Each sentence is a point in
-> space, and the groups are stretched rather than round. From theory
-> alone: which is the better test of whether a sentence belongs to a
-> group, Euclidean or Mahalanobis distance? One sentence, pick one. Don't
-> read any files yet.
+> space, and the groups are stretched rather than round. Which is the
+> better test of whether a sentence belongs to a group: Euclidean or
+> Mahalanobis distance?
 
 Expect **Mahalanobis** — it accounts for the stretch; Euclidean treats
-every direction alike. That is what the study team assumed too.
+every direction alike. That is what the study team assumed too. (The
+workspace's `CLAUDE.md` tells the assistant to answer theory questions
+from knowledge, committed and short, without opening files.)
 
 **2 — What do the numbers say?**
 
@@ -102,7 +103,17 @@ fails here: each topic's shape has to be estimated from a handful of
 reference sentences in 18 dimensions, so the shape it adapts to is mostly
 noise. Settling it took a person reading the sentences.
 
-**4 — Write the record**
+**4 — And what is it keeping?**
+
+> Now the other direction — the sentences Mahalanobis keeps that Euclidean
+> drops. You can read Korean; we can't. Tell us in English what each one
+> says, and whether it is a well-formed policy statement.
+
+Expect exactly two sentences, and both are broken OCR fragments (one
+contains a stray `| SLE` — visible junk even to a non-Korean reader). The
+theory-favored filter dropped substance and kept garbage.
+
+**5 — Write the record**
 
 > Write an ASTRA analysis file to /tmp/astra-demo/filter.yaml describing
 > what we just ran: the choice between the two measures, the one we're
@@ -114,7 +125,7 @@ what was ruled out and why, but not who ruled it out. In a record like
 that, an option a researcher examined and rejected is indistinguishable
 from a default nobody looked at.
 
-**5 — Add the actor layer**
+**6 — Add the actor layer**
 
 > Read notes/filter-decision-notes.md and add the RFC-0004 actor layer to
 > /tmp/astra-demo/filter.yaml: register everyone involved, and attribute
@@ -127,7 +138,7 @@ valid. These fields are enforced: an agent with no `model`, an unknown
 actor id, or an attribution on an option that is not marked excluded all
 fail validation.
 
-**6 — Read it back, and try to cheat**
+**7 — Read it back, and try to cheat**
 
 > Run astra info on /tmp/astra-demo/filter.yaml and tell me who ruled out
 > what. Then write a universe file in /tmp/astra-demo/ that selects the
