@@ -83,7 +83,7 @@ pipeline recomputes every quoted number from the committed data.
 |---|---|
 | [`astra-spec/`](https://github.com/Fosowl/astra-spec) | Fork submodule — the schema: `actor.yaml` LinkML module, RFC-0003 draft (`rfcs/0003-actor-attribution.md`) |
 | [`astra-tools/`](https://github.com/Fosowl/astra-tools) | Fork submodule — the tooling: semantic enforcement, CLI display, attributed `examples/iris` |
-| [`live-demo/`](live-demo/) | A working directory *before* any decision record exists — data, filter script, working notes — for authoring an attributed analysis from scratch |
+| [`live-demo/`](live-demo/) | A working directory *before* any decision record exists — data, filter script, working notes — for authoring an attributed analysis from scratch. Walkthrough: [`docs/live-demo-walkthrough.md`](docs/live-demo-walkthrough.md) |
 | [`install_and_validate.sh`](install_and_validate.sh) | One-shot local install + validation |
 | [`UPSTREAMING.md`](UPSTREAMING.md) | What goes upstream vs. fork-only wiring, PR strategy |
 

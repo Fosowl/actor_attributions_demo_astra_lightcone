@@ -28,7 +28,9 @@ legible turns.
   survey the repo, or check git state unprompted.
 - `notes/` holds the researcher's working notes. Read them when asked,
   not before.
-- Write new files to `/tmp` unless told otherwise.
+- **Write every new file to `/tmp/astra-demo/`** (create it if needed),
+  never into this directory. That keeps the workspace resettable between
+  runs — `./reset.sh` clears it.
 
 ## Commands
 

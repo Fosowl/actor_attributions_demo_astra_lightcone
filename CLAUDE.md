@@ -11,10 +11,11 @@ semantic validator, which is the actor layer's runtime enforcement point).
 - `astra-tools/examples/iris/` — toy attributed example.
 - `live-demo/` — a working directory as it stands *before* a decision
   record exists (data, filter script, working notes), used to author one
-  live. **It has its own `CLAUDE.md`, and it is self-contained: when
-  working there, do not read `korean-pledges-demo/` or the examples —
-  they hold the finished version of the same analysis and reading them
-  defeats the exercise.**
+  live; `live-demo/reset.sh` clears a run's output so it can be repeated.
+  **It has its own `CLAUDE.md`, and it is self-contained: when working
+  there, do not read `korean-pledges-demo/`, the examples, or
+  `docs/live-demo-walkthrough.md` — they hold the finished version of the
+  same analysis and reading them defeats the exercise.**
 - `korean-pledges-demo/` — real-data example: 218 Korean pledge sentences,
   a runnable filter (`run_demo.sh`), an attributed analysis
   (`analysis/astra.yaml`), a plain un-attributed twin
