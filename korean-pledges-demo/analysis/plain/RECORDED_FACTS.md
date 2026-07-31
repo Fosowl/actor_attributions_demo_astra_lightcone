@@ -7,7 +7,7 @@ records are not published with this artifact. The agent's model id was
 supplied by the researcher (the original sessions predate model-id
 capture).
 
-Encode these facts, exactly, when adding the RFC-0003 actor layer to a
+Encode these facts, exactly, when adding the RFC-0004 actor layer to a
 copy of `plain/astra.yaml`:
 
 - Actors:

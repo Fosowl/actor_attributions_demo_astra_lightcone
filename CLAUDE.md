@@ -1,6 +1,6 @@
 # CLAUDE.md — actor_attributions_demo_astra_lightcone
 
-Demo repository for the RFC-0003 **actor attribution** layer on ASTRA.
+Demo repository for the RFC-0004 **actor attribution** layer on ASTRA.
 The two submodules carry the working implementation: `astra-spec` (LinkML
 schema + generated datamodels) and `astra-tools` (the `astra` CLI and the
 semantic validator, which is the actor layer's runtime enforcement point).
@@ -41,7 +41,7 @@ cd korean-pledges-demo && ./run_demo.sh [-u <run-name>] [--validate]
 Tests for the Korean demo (from `korean-pledges-demo/`):
 `env -u PYTHONPATH ../.venv/bin/python -m pytest tests/ -v`
 
-## Actor layer authoring reference (RFC-0003)
+## Actor layer authoring reference (RFC-0004)
 
 Registry — one `actors:` map at analysis level:
 
